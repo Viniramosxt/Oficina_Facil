@@ -1,6 +1,6 @@
 # 🚗 Oficina Fácil
 
-**Oficina Fácil** é uma aplicação web projetada para oferecer planos de "saúde" para veículos, com foco em manutenção preventiva e corretiva. O sistema facilita o gerenciamento de clientes, veículos e serviços oferecidos, garantindo uma experiência eficiente e acessível para oficinas e proprietários de veículos.
+**Oficina Fácil** é uma aplicação web projetada para oferecer planos de manutenção para veículos, com foco em manutenção preventiva e corretiva. O sistema facilita o gerenciamento de clientes, veículos e serviços oferecidos, garantindo uma experiência eficiente e acessível para oficinas e proprietários de veículos.
 
 ## 🌟 Funcionalidades
 
