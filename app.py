@@ -97,6 +97,18 @@ def servicos():
 def perfil():
     return render_template('perfil.html', usuario=current_user)
 
+@app.route('/manutencao_preventiva')
+def manutencao_preventiva():
+    return render_template('manutencao_preventiva.html')
+
+@app.route('/reparos_emergencia')
+def reparos_emergencia():
+    return render_template('reparos_emergencia.html')
+
+@app.route('/historico_veiculo')
+def historico_veiculo():
+    return render_template('historico_veiculo.html')
+
 # Finalizando a criação do banco de dados
 if __name__ == '__main__':
     with app.app_context():

@@ -1,10 +1,10 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
 {% block title %}Home - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
 <section class="hero">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo OFICINA FÁCIL" class="logo">
     <h1>Bem-vindo ao OFICINA FÁCIL</h1>
     {% if 'user_id' in session %}
         <p>Olá, {{ current_user.username }}! Você está logado.</p>
@@ -24,18 +24,21 @@
         <div class="service-card">
             <h3>Manutenção Preventiva</h3>
             <p>Mantenha seu veículo sempre em dia</p>
+            <a href="{{ url_for('manutencao_preventiva') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
         </div>
         <div class="service-card">
             <h3>Reparos de Emergência</h3>
             <p>Assistência quando você mais precisa</p>
+            <a href="{{ url_for('reparos_emergencia') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
         </div>
         <div class="service-card">
             <h3>Histórico do Veículo</h3>
             <p>Acompanhe todas as manutenções</p>
+            <a href="{{ url_for('historico_veiculo') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
         </div>
     </div>
     {% if 'user_id' in session %}
-        <a href="{{ url_for('servicos') }}" class="btn-primary">Ver Planos</a>
+        <a href="{{ url_for('servicos') }}" class="btn-primary">Ver Todos os Planos</a>
     {% else %}
         <p>Faça login para ver os planos disponíveis.</p>
     {% endif %}
