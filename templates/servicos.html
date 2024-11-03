@@ -1,0 +1,34 @@
+<!-- templates/servicos.html -->
+{% extends "base.html" %}
+
+{% block title %}Serviços - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<section class="planos-section">
+    <h1>Nossos Planos</h1>
+    <p>Escolha o plano que melhor se adapta às necessidades do seu veículo.</p>
+
+    <div class="planos-container">
+        <div class="plano-card">
+            <h2>Plano Básico</h2>
+            <p>Ideal para quem deseja cobrir apenas as manutenções essenciais.</p>
+            <div class="preco">R$ 100,00 <span>/mês</span></div>
+            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+        </div>
+
+        <div class="plano-card destaque">
+            <h2>Plano Intermediário</h2>
+            <p>Cobertura adicional para serviços de médio porte e revisões.</p>
+            <div class="preco">R$ 200,00 <span>/mês</span></div>
+            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+        </div>
+
+        <div class="plano-card">
+            <h2>Plano Premium</h2>
+            <p>Para quem busca cobertura completa com todas as manutenções e serviços.</p>
+            <div class="preco">R$ 300,00 <span>/mês</span></div>
+            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

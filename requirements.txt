@@ -1,0 +1,4 @@
+Flask
+Flask-SQLAlchemy
+pymysql
+pip freeze > requirements.txt
