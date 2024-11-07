@@ -1,3 +1,4 @@
+<!-- perfil.html -->
 {% extends "base.html" %}
 
 {% block title %}Perfil - OFICINA FÁCIL{% endblock %}
@@ -5,9 +6,36 @@
 {% block content %}
 <div class="auth-container">
     <h2>Meu Perfil</h2>
-    <p>Nome: {{ usuario.username }}</p>
-    <p>Email: {{ usuario.email }}</p>
-    <p>Data de criação: {{ usuario.date_created.strftime('%d/%m/%Y') }}</p>
+    <p><strong>Nome:</strong> {{ usuario.username }}</p>
+    <p><strong>Email:</strong> {{ usuario.email }}</p>
+    <p><strong>Data de criação:</strong> {{ usuario.date_created.strftime('%d/%m/%Y') }}</p>
+    
+    <h3>Informações do Veículo</h3>
+    <p><strong>Marca:</strong> {{ usuario.marca }}</p>
+    <p><strong>Modelo:</strong> {{ usuario.modelo }}</p>
+    <p><strong>Ano de Fabricação:</strong> {{ usuario.ano_fabricacao }}</p>
+    <p><strong>Cor:</strong> {{ usuario.cor }}</p>
+    <p><strong>Placa:</strong> {{ usuario.placa }}</p>
+    <p><strong>Renavam:</strong> {{ usuario.renavam }}</p>
+
+    <h3>Fotos</h3>
+    <p><strong>Foto de Perfil:</strong> 
+        {% if usuario.foto_perfil %}
+            <img src="{{ url_for('static', filename='images/' + usuario.foto_perfil) }}" alt="Foto de Perfil" width="100">
+        {% else %}
+            <img src="{{ url_for('static', filename='images/default-profile.jpg') }}" alt="Foto de Perfil" width="100">
+        {% endif %}
+    </p>
+    
+    <p><strong>Foto do CRLV:</strong> 
+        {% if usuario.foto_crlv %}
+            <img src="{{ url_for('static', filename='images/' + usuario.foto_crlv) }}" alt="Foto do CRLV" width="100">
+        {% else %}
+            <img src="{{ url_for('static', filename='images/default-crlv.jpg') }}" alt="Foto do CRLV" width="100">
+        {% endif %}
+    </p>
+    
+    <a href="{{ url_for('edit_profile') }}" class="btn-primary">Editar Perfil</a>
     <a href="{{ url_for('home') }}" class="btn-primary">Voltar à Home</a>
 </div>
 {% endblock %}

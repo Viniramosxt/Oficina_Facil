@@ -9,14 +9,19 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="{{ url_for('home') }}" class="logo">OFICINA FÁCIL</a>
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Oficina Fácil" class="logo-img">
+                <span>OFICINA FÁCIL</span>
+            </a>
             <div class="nav-links">
                 <a href="{{ url_for('home') }}">Home</a>
                 <a href="{{ url_for('servicos') }}">Serviços</a>
                 {% if 'user_id' in session %}
+                    <!-- Links visíveis apenas para usuários logados -->
                     <a href="{{ url_for('perfil') }}">Meu Perfil</a>
                     <a href="{{ url_for('logout') }}">Sair</a>
                 {% else %}
+                    <!-- Links visíveis apenas para visitantes -->
                     <a href="{{ url_for('login') }}">Login</a>
                     <a href="{{ url_for('register') }}" class="btn-register">Cadastre-se</a>
                 {% endif %}

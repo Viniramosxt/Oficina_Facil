@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from config import Config
-from extensions import db
+from extensions import db  # Aqui você já tem o db, então remova 'migrate' da importação
+from flask_migrate import Migrate  # Importe o Migrate
 from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+import os  # Adicionando a importação do módulo os para manipulação de arquivos
+from forms import EditProfileForm  # Certifique-se de que o caminho esteja correto
+# Certifique-se de importar o formulário corretamente
+# Exemplo:
+# from forms import EditProfileForm  # Importe o form de edição de perfil, se estiver em um arquivo separado.
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,7 +26,9 @@ login_manager.login_view = 'login'  # Define a página de login para redireciona
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Inicialize o banco de dados e o Flask-Migrate
 db.init_app(app)
+migrate = Migrate(app, db)  # Inicializa o Migrate com a aplicação e o banco de dados
 
 # Rota inicial
 @app.route('/')
@@ -35,15 +43,23 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')  # Usando .get() para evitar KeyError
-        password = request.form.get('password')  # Usando .get() para evitar KeyError
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-        if username and password:  # Verifica se os campos foram preenchidos
+        if username and password:
             user = User.query.filter_by(username=username).first()
-            if user and check_password_hash(user.password, password):  # Verifique a senha de forma segura
-                login_user(user)  # Utilize login_user do Flask-Login
-                return redirect(url_for('home'))
-            flash('Credenciais inválidas.', 'danger')
+            if user:
+                print(f"Usuário encontrado: {user.username}")
+            else:
+                print("Usuário não encontrado.")
+            
+            if user and check_password_hash(user.password, password):
+                login_user(user)
+                print(f"Usuário logado: {current_user.username}")
+                return redirect(url_for('perfil'))  # Verifique se essa rota está correta
+            else:
+                print("Falha na autenticação - credenciais inválidas.")
+                flash('Credenciais inválidas.', 'danger')
         else:
             flash('Por favor, preencha todos os campos.', 'danger')
 
@@ -109,8 +125,48 @@ def reparos_emergencia():
 def historico_veiculo():
     return render_template('historico_veiculo.html')
 
+# Rota para editar o perfil
+@app.route('/perfil/editar', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()  # Criando uma instância do formulário
+    if form.validate_on_submit():  # Se o formulário for enviado e validado
+        # Atualizando dados do veículo
+        current_user.marca = form.marca.data
+        current_user.modelo = form.modelo.data
+        current_user.ano_fabricacao = form.ano_fabricacao.data
+        current_user.cor = form.cor.data
+        current_user.placa = form.placa.data
+        current_user.renavam = form.renavam.data
+
+        # Atualizando fotos
+        if form.foto_perfil.data:
+            foto_perfil_path = os.path.join('static/uploads', secure_filename(form.foto_perfil.data.filename))
+            form.foto_perfil.data.save(foto_perfil_path)
+            current_user.foto_perfil = foto_perfil_path
+
+        if form.crlv_foto.data:
+            crlv_foto_path = os.path.join('static/uploads', secure_filename(form.crlv_foto.data.filename))
+            form.crlv_foto.data.save(crlv_foto_path)
+            current_user.foto_crlv = crlv_foto_path
+
+        db.session.commit()  # Salvando no banco de dados
+        flash('Perfil atualizado com sucesso!')  # Mensagem de sucesso
+        return redirect(url_for('perfil'))  # Redirecionando para o perfil
+
+    elif request.method == 'GET':
+        # Preenchendo o formulário com os dados atuais
+        form.marca.data = current_user.marca
+        form.modelo.data = current_user.modelo
+        form.ano_fabricacao.data = current_user.ano_fabricacao
+        form.cor.data = current_user.cor
+        form.placa.data = current_user.placa
+        form.renavam.data = current_user.renavam
+
+    return render_template('edit_profile.html', form=form)
+
 # Finalizando a criação do banco de dados
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Isso cria o banco de dados se ainda não existir
     app.run(debug=True)
