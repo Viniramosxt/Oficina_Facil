@@ -22,14 +22,34 @@
 Oficina_Facil/
 ├── app.py                  # Arquivo principal para rodar a aplicação
 ├── config.py               # Configurações do Flask e banco de dados
+├── extensions.py           # Extensões e integrações do Flask (Ex: Flask-Login)
+├── forms.py                # Definição dos formulários para cadastro e edição de dados
+├── manage.py               # Script de gerenciamento do projeto (ex: migrações, gerenciamento de banco de dados)
 ├── models.py               # Modelos de dados (definições das tabelas)
-├── templates/              # Diretório para armazenar os arquivos HTML
-│   ├── index.html
-│   ├── servicos.html
-│   ├── login.html
-│   └── register.html
-├── static/                 # Diretório para arquivos estáticos (CSS, JS)
-│   ├── css/
-│   │   └── style.css
 ├── requirements.txt        # Dependências do projeto (Flask, SQLAlchemy, etc.)
-└── _pycache_/              # Cache de Python (pasta gerada automaticamente)
+├── .gitignore              # Arquivo para ignorar arquivos temporários e de configuração
+├── README.md               # Este arquivo
+├── _pycache_/              # Cache de Python (pasta gerada automaticamente)
+├── .venv                   # Ambiente virtual (não versionado no Git)
+├── migrations/             # Diretório de migrações do banco de dados (se utilizado Alembic)
+├── static/                 # Diretório para arquivos estáticos (CSS, JS, imagens, uploads)
+│   ├── css/                
+│   │   └── style.css       # Arquivo de estilos (CSS)
+│   ├── js/
+│   │   └── localizacao.js  # Script de geolocalização
+│   ├── images/
+│   │   └── logo.png       # Logo da aplicação
+│   └── uploads/            # Diretório para armazenar arquivos enviados pelos usuários (ex: imagens, documentos)
+├── templates/              # Diretório para armazenar os arquivos HTML/Pug
+│   ├── base.html           # Layout base para as páginas
+│   ├── edit_profile.html   # Página de edição de perfil do usuário
+│   ├── historico_veiculo.html  # Histórico de manutenções do veículo
+│   ├── index.html          # Página inicial
+│   ├── index.pug           # Versão Pug da página inicial
+│   ├── login.html          # Página de login
+│   ├── manutencao_preventiva.html # Página de manutenção preventiva
+│   ├── perfil.html         # Página de perfil do usuário
+│   ├── register.html       # Página de registro de novos usuários
+│   ├── reparos_emergencia.html # Página de reparos emergenciais
+│   └── servicos.html       # Página com os serviços oferecidos
+
