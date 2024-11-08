@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os  # Adicionando a importação do módulo os para manipulação de arquivos
 from forms import EditProfileForm  # Certifique-se de que o caminho esteja correto
+from werkzeug.utils import secure_filename
 # Certifique-se de importar o formulário corretamente
 # Exemplo:
 # from forms import EditProfileForm  # Importe o form de edição de perfil, se estiver em um arquivo separado.
@@ -92,14 +93,17 @@ def register():
             flash('E-mail já cadastrado. Faça login.', 'warning')
             return redirect(url_for('login'))
 
+    try:
         # Cria um novo usuário
         novo_usuario = User(username=nome, email=email, password=senha_hash)
         db.session.add(novo_usuario)
         db.session.commit()
         flash('Cadastro realizado com sucesso! Faça login.', 'success')
         return redirect(url_for('login'))
-
-    return render_template('register.html')
+    except Exception as e:
+        db.session.rollback()  # Desfaz qualquer mudança no banco
+        flash(f'Ocorreu um erro ao tentar cadastrar: {str(e)}', 'danger')
+        return render_template('register.html')
 
 # Rota de serviços
 @app.route('/servicos')
@@ -107,11 +111,13 @@ def register():
 def servicos():
     return render_template('servicos.html')
 
-# Rota de Perfil (protegida)
+
 @app.route('/perfil')
-@login_required  # Protege a rota
+@login_required  # Garante que o usuário esteja autenticado
 def perfil():
-    return render_template('perfil.html', usuario=current_user)
+    # Agora você pode acessar o current_user diretamente
+    return render_template('perfil.html', user=current_user)
+
 
 @app.route('/manutencao_preventiva')
 def manutencao_preventiva():
@@ -126,44 +132,48 @@ def historico_veiculo():
     return render_template('historico_veiculo.html')
 
 # Rota para editar o perfil
-@app.route('/perfil/editar', methods=['GET', 'POST'])
-@login_required
+@app.route('/editar_perfil', methods=['GET', 'POST'])
+@login_required  # Garante que o usuário esteja autenticado
 def edit_profile():
-    form = EditProfileForm()  # Criando uma instância do formulário
-    if form.validate_on_submit():  # Se o formulário for enviado e validado
-        # Atualizando dados do veículo
-        current_user.marca = form.marca.data
-        current_user.modelo = form.modelo.data
-        current_user.ano_fabricacao = form.ano_fabricacao.data
-        current_user.cor = form.cor.data
-        current_user.placa = form.placa.data
-        current_user.renavam = form.renavam.data
+    user = current_user  # Acessa o usuário logado via Flask-Login
 
-        # Atualizando fotos
-        if form.foto_perfil.data:
-            foto_perfil_path = os.path.join('static/uploads', secure_filename(form.foto_perfil.data.filename))
-            form.foto_perfil.data.save(foto_perfil_path)
-            current_user.foto_perfil = foto_perfil_path
+    if request.method == 'POST':
+        # Aqui você coleta os dados do formulário e salva as alterações
+        user.username = request.form['username']
+        user.email = request.form['email']
+        
+        # Coleta os dados do veículo
+        user.marca = request.form['marca']
+        user.modelo = request.form['modelo']
+        user.ano_fabricacao = request.form['ano_fabricacao']
+        user.cor = request.form['cor']
+        user.placa = request.form['placa']
+        user.renavam = request.form['renavam']
+        
+        # Se o upload das fotos for feito, processa e armazena
+        if 'foto_perfil' in request.files:
+            foto_perfil = request.files['foto_perfil']
+            if foto_perfil:
+                # Salve a foto no diretório correto
+                foto_perfil.save(os.path.join(app.config['UPLOAD_FOLDER'], foto_perfil.filename))
+                user.foto_perfil = foto_perfil.filename
+        
+        if 'foto_crlv' in request.files:
+            foto_crlv = request.files['foto_crlv']
+            if foto_crlv:
+                foto_crlv.save(os.path.join(app.config['UPLOAD_FOLDER'], foto_crlv.filename))
+                user.foto_crlv = foto_crlv.filename
+        
+        # Atualiza no banco de dados
+        db.session.commit()
 
-        if form.crlv_foto.data:
-            crlv_foto_path = os.path.join('static/uploads', secure_filename(form.crlv_foto.data.filename))
-            form.crlv_foto.data.save(crlv_foto_path)
-            current_user.foto_crlv = crlv_foto_path
+        # Mensagem de sucesso
+        flash('Perfil atualizado com sucesso!', 'success')
 
-        db.session.commit()  # Salvando no banco de dados
-        flash('Perfil atualizado com sucesso!')  # Mensagem de sucesso
-        return redirect(url_for('perfil'))  # Redirecionando para o perfil
-
-    elif request.method == 'GET':
-        # Preenchendo o formulário com os dados atuais
-        form.marca.data = current_user.marca
-        form.modelo.data = current_user.modelo
-        form.ano_fabricacao.data = current_user.ano_fabricacao
-        form.cor.data = current_user.cor
-        form.placa.data = current_user.placa
-        form.renavam.data = current_user.renavam
-
-    return render_template('edit_profile.html', form=form)
+        # Redireciona para a página de perfil
+        return redirect(url_for('perfil'))
+    
+    return render_template('edit_profile.html', user=user)
 
 # Finalizando a criação do banco de dados
 if __name__ == '__main__':

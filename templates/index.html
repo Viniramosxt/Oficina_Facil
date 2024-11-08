@@ -5,16 +5,7 @@
 {% block content %}
 <section class="hero">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo OFICINA FÁCIL" class="logo center-logo">
-    <h1>Bem-vindo ao OFICINA FÁCIL</h1>
-    {% if current_user.is_authenticated %}
-        <p>Olá, {{ current_user.username }}! Você está logado.</p>
-        <a href="{{ url_for('perfil') }}" class="btn-primary">Meu Perfil</a>
-        <a href="{{ url_for('logout') }}" class="btn-secondary">Sair</a>
-    {% else %}
-        <p>{{ mensagem }}</p>
-        <a href="{{ url_for('login') }}" class="btn-primary">Login</a>
-        <a href="{{ url_for('register') }}" class="btn-secondary">Cadastrar-se</a>
-    {% endif %}
+    <h1>Bem-vindo ao Oficina Fácil</h1>
 </section>
 
 <section id="sobre" class="section">
@@ -25,17 +16,17 @@
 <section id="servicos" class="section">
     <h2>Serviços</h2>
     <div class="services-grid">
-        <div class="service-card">
+        <div class="service-card" id="card1">
             <h3>Manutenção Preventiva</h3>
             <p>Mantenha seu veículo sempre em dia</p>
             <a href="{{ url_for('manutencao_preventiva') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card2">
             <h3>Reparos de Emergência</h3>
             <p>Assistência quando você mais precisa</p>
             <a href="{{ url_for('reparos_emergencia') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
         </div>
-        <div class="service-card">
+        <div class="service-card" id="card3">
             <h3>Histórico do Veículo</h3>
             <p>Acompanhe todas as manutenções</p>
             <a href="{{ url_for('historico_veiculo') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
@@ -45,6 +36,7 @@
         <a href="{{ url_for('servicos') }}" class="btn-primary">Ver Todos os Planos</a>
     {% else %}
         <p>Faça login para ver os planos disponíveis.</p>
+        <a href="{{ url_for('login') }}" class="btn-primary">Login</a>
     {% endif %}
 </section>
 
@@ -53,5 +45,32 @@
     <button id="locationButton" class="btn-primary">Usar minha localização</button>
 </section>
 
+<!-- Seção do Mapa -->
+<section id="map-container" class="section">
+    <h2>Oficinas Próximas</h2>
+    <div id="map" style="width: 100%; height: 400px;"></div>
+</section>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
 <script src="{{ url_for('static', filename='js/localizacao.js') }}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const cards = document.querySelectorAll('.service-card');  // Seleciona todos os cards
+
+    cards.forEach(card => {
+        // Quando o mouse entra no card, adiciona a classe de animação
+        card.addEventListener('mouseenter', function() {
+            card.classList.add('zoomed');
+        });
+
+        // Quando o mouse sai do card, remove a classe de animação
+        card.addEventListener('mouseleave', function() {
+            card.classList.remove('zoomed');
+        });
+    });
+});
+</script>
+
 {% endblock %}
