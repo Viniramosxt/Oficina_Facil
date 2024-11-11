@@ -2,12 +2,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from config import Config
 from extensions import db  # Aqui você já tem o db, então remova 'migrate' da importação
 from flask_migrate import Migrate  # Importe o Migrate
-from models import User
+from models import User,Funcionario,Oficina,Relatorio, Plano
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os  # Adicionando a importação do módulo os para manipulação de arquivos
 from forms import EditProfileForm  # Certifique-se de que o caminho esteja correto
 from werkzeug.utils import secure_filename
+from sqlalchemy.exc import IntegrityError
+
+
 # Certifique-se de importar o formulário corretamente
 # Exemplo:
 # from forms import EditProfileForm  # Importe o form de edição de perfil, se estiver em um arquivo separado.
@@ -107,9 +110,28 @@ def register():
 
 # Rota de serviços
 @app.route('/servicos')
-@login_required  # Protege a rota
 def servicos():
-    return render_template('servicos.html')
+    planos = [
+        {
+            'id': 1,
+            'nome': 'Plano Básico',
+            'preco': '100,00',
+            'features': ['Manutenções essenciais', 'Checagem mensal', 'Suporte básico']
+        },
+        {
+            'id': 2,
+            'nome': 'Plano Intermediário',
+            'preco': '200,00',
+            'features': ['Todos os benefícios do plano básico', 'Serviços de médio porte', 'Revisões programadas', 'Suporte prioritário']
+        },
+        {
+            'id': 3,
+            'nome': 'Plano Premium',
+            'preco': '300,00',
+            'features': ['Todos os benefícios do plano intermediário', 'Cobertura completa', 'Assistência 24h', 'Benefícios exclusivos']
+        }
+    ]
+    return render_template('servicos.html', planos=planos)
 
 
 @app.route('/perfil')
@@ -118,25 +140,67 @@ def perfil():
     # Agora você pode acessar o current_user diretamente
     return render_template('perfil.html', user=current_user)
 
-
-@app.route('/manutencao_preventiva')
-def manutencao_preventiva():
-    return render_template('manutencao_preventiva.html')
-
 @app.route('/reparos_emergencia')
 def reparos_emergencia():
     return render_template('reparos_emergencia.html')
 
 @app.route('/historico_veiculo')
+@login_required
 def historico_veiculo():
-    return render_template('historico_veiculo.html')
+    # Obter todos os relatórios associados ao cliente logado
+    relatorios = Relatorio.query.filter_by(id_cliente=current_user.id).all()
+    return render_template('historico_veiculo.html', relatorios=relatorios)
 
-# Rota para editar o perfil
+@app.route('/editar_perfil_oficina', methods=['GET', 'POST'])
+@login_required  # Se necessário para autenticação
+def editar_perfil_oficina():
+    # Aqui você pega a oficina que será editada (exemplo usando ID)
+    oficina = Oficina.query.first()  # ou use .filter_by(id=some_id) para pegar uma oficina específica
+
+    if request.method == 'POST':
+        # Processa os dados enviados via POST
+        oficina.nome_oficina = request.form['nome_oficina']
+        oficina.localizacao = request.form['localizacao']
+        # Adicione outros campos conforme necessário
+
+        try:
+            db.session.commit()  # Substitua 'db' pelo seu objeto de banco de dados
+            flash('Perfil da oficina atualizado com sucesso!', 'success')
+            return redirect(url_for('perfil_oficina'))  # Redireciona para a página de perfil da oficina
+        except Exception as e:
+            flash(f'Ocorreu um erro: {e}', 'danger')
+            db.session.rollback()
+
+    # Para o método GET, exibe o formulário com os dados atuais
+    return render_template('editar_perfil_oficina.html', oficina=oficina)
+
+@app.route('/assinar_plano/<int:plano_id>', methods=['GET', 'POST'])
+@login_required
+def assinar_plano(plano_id):
+    plano = Plano.query.get(plano_id)
+    if plano:
+        # Associar o plano ao usuário
+        current_user.plano_assinado_id = plano.id
+        db.session.commit()
+        flash('Plano assinado com sucesso!', 'success')
+        return redirect(url_for('perfil'))  # Redireciona para o perfil do usuário
+    flash('Plano não encontrado', 'danger')
+    return redirect(url_for('servicos'))  # Se o plano não for encontrado, redireciona para a página de serviços
+
+
+@app.route('/confirmar_assinatura/<int:plano_id>', methods=['GET', 'POST'])
+def confirmar_assinatura(plano_id):
+    # Lógica para confirmar a assinatura
+    pass
+
 @app.route('/editar_perfil', methods=['GET', 'POST'])
 @login_required  # Garante que o usuário esteja autenticado
 def edit_profile():
     user = current_user  # Acessa o usuário logado via Flask-Login
 
+    # Supondo que você tenha uma função para obter a oficina do usuário
+    oficina = obter_oficina(user.id)  # Adicione esta função para recuperar os dados da oficina associada ao usuário
+    
     if request.method == 'POST':
         # Aqui você coleta os dados do formulário e salva as alterações
         user.username = request.form['username']
@@ -173,8 +237,111 @@ def edit_profile():
         # Redireciona para a página de perfil
         return redirect(url_for('perfil'))
     
-    return render_template('edit_profile.html', user=user)
+    return render_template('edit_profile.html', user=user, oficina=oficina)
 
+# Função para obter os dados da oficina do usuário (exemplo)
+def obter_oficina(user_id):
+    # Aqui você faria uma consulta ao banco de dados para pegar os dados da oficina relacionada ao usuário
+    oficina = Oficina.query.filter_by(user_id=user_id).first()  # Exemplo de consulta, ajuste conforme o seu modelo
+    return oficina
+
+
+# Rota de Login para Oficinas
+@app.route('/login_oficina', methods=['GET', 'POST'])
+def login_oficina():
+    if request.method == 'POST':
+        cnpj = request.form.get('cnpj')
+        senha = request.form.get('password')
+        oficina = Oficina.query.filter_by(cnpj=cnpj).first()
+
+        # Verifica se o CNPJ está cadastrado
+        if oficina:
+            # Verifica se a senha está correta
+            if check_password_hash(oficina.senha_hash, senha):
+                session['oficina_id'] = oficina.id
+                flash('Login realizado com sucesso!', 'success')
+                return redirect(url_for('perfil_oficina'))
+            else:
+                flash('Senha incorreta. Tente novamente.', 'danger')
+        else:
+            flash('CNPJ não encontrado. Por favor, cadastre sua oficina.', 'danger')
+
+    return render_template('login_oficina.html')
+
+
+# Rota de Cadastro para Oficinas
+@app.route('/register_oficina', methods=['GET', 'POST'])
+def register_oficina():
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        email = request.form.get('email')
+        senha = request.form.get('password')
+        cnpj = request.form.get('cnpj')
+
+        # Verificar se o CNPJ já está cadastrado
+        if Oficina.query.filter_by(cnpj=cnpj).first():
+            flash('CNPJ já cadastrado. Tente outro.', 'danger')
+            return redirect(url_for('register_oficina'))
+
+        # Verificar se o email já está cadastrado
+        if Oficina.query.filter_by(email=email).first():
+            flash('E-mail já cadastrado. Tente outro.', 'danger')
+            return redirect(url_for('register_oficina'))
+
+        # Criptografar a senha
+        senha_criptografada = generate_password_hash(senha)
+
+        # Criar e salvar a nova oficina
+        try:
+            nova_oficina = Oficina(nome=nome, email=email, senha=senha_criptografada, cnpj=cnpj)
+            db.session.add(nova_oficina)
+            db.session.commit()
+            flash('Cadastro realizado com sucesso! Faça login para acessar sua conta.', 'success')
+            return redirect(url_for('login_oficina'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Erro ao cadastrar oficina. Tente novamente mais tarde.', 'danger')
+
+    return render_template('register_oficina.html')
+
+@app.route('/perfil_oficina', methods=['GET', 'POST'])
+def perfil_oficina():
+    # Supondo que a oficina tenha o ID 1 (ajuste conforme necessário)
+    oficina = Oficina.query.get(1)
+
+    if request.method == 'POST':
+        # Lógica de atualização do perfil
+        oficina.nome = request.form['nome']
+        oficina.email = request.form['email']
+        oficina.atendimentos = request.form.get('atendimentos', oficina.atendimentos)
+        oficina.avaliacao = request.form.get('avaliacao', oficina.avaliacao)
+        oficina.especialidades = request.form['especialidades']
+        oficina.horario = request.form['horario']
+        
+        db.session.commit()
+        flash('Perfil atualizado com sucesso!', 'success')
+        return redirect(url_for('perfil_oficina'))
+
+    return render_template('perfil_oficina.html', oficina=oficina)
+
+@app.route('/editar_perfil', methods=['GET', 'POST'])
+def editar_perfil():
+    oficina = Oficina.query.get(1)  # Supondo que a oficina tenha o ID 1
+    
+    if request.method == 'POST':
+        # Atualizar os dados do perfil da oficina
+        oficina.nome = request.form['nome']
+        oficina.email = request.form['email']
+        oficina.atendimentos = request.form.get('atendimentos', oficina.atendimentos)
+        oficina.avaliacao = request.form.get('avaliacao', oficina.avaliacao)
+        oficina.especialidades = request.form['especialidades']
+        oficina.horario = request.form['horario']
+        
+        db.session.commit()
+        flash('Perfil atualizado com sucesso!', 'success')
+        return redirect(url_for('perfil_oficina'))
+
+    return render_template('editar_perfil.html', oficina=oficina)
 # Finalizando a criação do banco de dados
 if __name__ == '__main__':
     with app.app_context():

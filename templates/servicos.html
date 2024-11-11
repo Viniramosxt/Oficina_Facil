@@ -1,34 +1,207 @@
-<!-- templates/servicos.html -->
 {% extends "base.html" %}
-
 {% block title %}Serviços - OFICINA FÁCIL{% endblock %}
-
 {% block content %}
-<section class="planos-section">
-    <h1>Nossos Planos</h1>
-    <p>Escolha o plano que melhor se adapta às necessidades do seu veículo.</p>
+<div class="services-container">
+  <!-- Seção de Planos Mensais -->
+  <section class="plans-section">
+    <header class="section-header">
+      <h1>Planos de Manutenção</h1>
+      <p class="subtitle">Escolha o plano mensal que melhor se adapta às necessidades do seu veículo</p>
+    </header>
 
-    <div class="planos-container">
-        <div class="plano-card">
-            <h2>Plano Básico</h2>
-            <p>Ideal para quem deseja cobrir apenas as manutenções essenciais.</p>
-            <div class="preco">R$ 100,00 <span>/mês</span></div>
-            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Plano Básico</h3>
+          <div class="price">
+            <span class="amount">R$ 100,00</span>
+            <span class="period">/mês</span>
+          </div>
         </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Manutenções essenciais</li>
+            <li><i class="fas fa-check"></i> Checagem mensal</li>
+            <li><i class="fas fa-check"></i> Suporte básico</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('login') }}" class="plan-btn">Assinar Plano</a>
+      </div>
 
-        <div class="plano-card destaque">
-            <h2>Plano Intermediário</h2>
-            <p>Cobertura adicional para serviços de médio porte e revisões.</p>
-            <div class="preco">R$ 200,00 <span>/mês</span></div>
-            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+      <div class="plan-card featured">
+        <div class="featured-badge">Mais Popular</div>
+        <div class="plan-header">
+          <h3>Plano Intermediário</h3>
+          <div class="price">
+            <span class="amount">R$ 200,00</span>
+            <span class="period">/mês</span>
+          </div>
         </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Todos os benefícios do plano básico</li>
+            <li><i class="fas fa-check"></i> Serviços de médio porte</li>
+            <li><i class="fas fa-check"></i> Revisões programadas</li>
+            <li><i class="fas fa-check"></i> Suporte prioritário</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('login') }}" class="plan-btn">Assinar Plano</a>
+      </div>
 
-        <div class="plano-card">
-            <h2>Plano Premium</h2>
-            <p>Para quem busca cobertura completa com todas as manutenções e serviços.</p>
-            <div class="preco">R$ 300,00 <span>/mês</span></div>
-            <a href="{{ url_for('login') }}" class="btn-primary">Assinar Plano</a>
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Plano Premium</h3>
+          <div class="price">
+            <span class="amount">R$ 300,00</span>
+            <span class="period">/mês</span>
+          </div>
         </div>
+        <div class="plan-features">
+          <ul>
+            <li><i class="fas fa-check"></i> Todos os benefícios do plano intermediário</li>
+            <li><i class="fas fa-check"></i> Cobertura completa</li>
+            <li><i class="fas fa-check"></i> Assistência 24h</li>
+            <li><i class="fas fa-check"></i> Benefícios exclusivos</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('login') }}" class="plan-btn">Assinar Plano</a>
+      </div>
     </div>
-</section>
+  </section>
+</div>
+<style>
+.services-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 80px auto 0;
+  color: var(--text-color);
+}
+
+/* Estilos do cabeçalho das seções */
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-header h1,
+.section-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* Estilos dos Planos */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.plan-card {
+  background: var(--primary-color);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.plan-card.featured {
+  border: 2px solid var(--accent-color);
+  transform: scale(1.05);
+}
+
+.featured-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: var(--accent-color);
+  color: var(--text-color);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.price {
+  margin: 1rem 0;
+}
+
+.amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.period {
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+.plan-features li {
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plan-features i {
+  color: var(--accent-color);
+}
+
+.plan-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: var(--secondary-color);
+  color: var(--text-color);
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.plan-btn:hover {
+  background: var(--hover-color);
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .services-container {
+    padding: 1rem;
+  }
+
+  .plans-grid,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-card.featured {
+    transform: none;
+  }
+
+  .section-header h1,
+  .section-header h2 {
+    font-size: 2rem;
+  }
+}
+</style>
 {% endblock %}

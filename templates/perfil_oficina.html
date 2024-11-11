@@ -1,130 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}Perfil - OFICINA FÁCIL{% endblock %}
+{% block title %}Perfil da Oficina - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="profile-container">
-  <div class="profile-card">
-    <div class="profile-header">
-      <div class="profile-cover"></div>
-      <div class="profile-avatar">
-        {% if user.foto_perfil %}
-          <img src="{{ url_for('static', filename='uploads/' + user.foto_perfil) }}" alt="Foto de Perfil" class="profile-img">
-        {% else %}
-          <img src="{{ url_for('static', filename='uploads/default-profile.jpg') }}" alt="Foto de Perfil" class="profile-img">
-        {% endif %}
-        <a href="{{ url_for('edit_profile') }}" class="change-photo-btn">
-          <i class="fas fa-camera"></i>
-        </a>
-      </div>
-      <h1>{{ user.username }}</h1>
-      <p class="user-email">{{ user.email }}</p>
-      <p class="member-since">Membro desde {{ user.date_created.strftime('%d/%m/%Y') }}</p>
+<div class="profile-container max-w-4xl mx-auto px-4 py-6">
+  <div class="profile-card bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="profile-header text-center py-6 bg-gray-200">
+      <!-- Logo da Oficina, se houver, substitua o link do placeholder -->
+      <img src="{{ oficina.logo_url or '/api/placeholder/150/150' }}" alt="Logo da Oficina" class="profile-img mb-6 rounded-full w-32 h-32 mx-auto">
+      <h2 class="text-xl font-semibold">{{ oficina.nome }}</h2>
+      <p class="email text-gray-600">{{ oficina.email }}</p>
     </div>
 
-    <div class="profile-content">
-      <div class="profile-section personal-info">
-        <div class="section-header">
-          <h2><i class="fas fa-user"></i> Informações Pessoais</h2>
-          <a href="{{ url_for('edit_profile') }}" class="edit-section-btn">
-            <i class="fas fa-edit"></i> Editar
-          </a>
+    <div class="profile-body px-6 py-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
+          <h3 class="text-lg font-medium">Atendimentos</h3>
+          <p class="stat-number text-2xl">{{ oficina.atendimentos|default(0) }}</p>
         </div>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="label">Nome</span>
-            <span class="value">{{ user.username }}</span>
+        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
+          <h3 class="text-lg font-medium">Avaliação</h3>
+          <p class="stat-number text-2xl">{{ "%.1f"|format(oficina.avaliacao|default(5.0)) }}/5.0</p>
+        </div>
+        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
+          <h3 class="text-lg font-medium">Especialidades</h3>
+          <div class="tags">
+            {% for esp in oficina.especialidades|default(['Mecânica Geral']) %}
+              <span class="tag bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">{{ esp }}</span>
+            {% endfor %}
           </div>
-          <div class="info-item">
-            <span class="label">Email</span>
-            <span class="value">{{ user.email }}</span>
-          </div>
         </div>
-      </div>
-
-      <div class="profile-section plan-info">
-        <div class="section-header">
-          <h2><i class="fas fa-cogs"></i> Plano Assinado</h2>
-          <a href="{{ url_for('edit_profile') }}" class="edit-section-btn">
-            <i class="fas fa-edit"></i> Editar
-          </a>
-        </div>
-        <div class="info-grid">
-          {% if user.plano_assinado %}
-            <div class="info-item">
-              <span class="label">Plano</span>
-              <span class="value">{{ user.plano_assinado.nome }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Preço</span>
-              <span class="value">R$ {{ user.plano_assinado.preco }} por mês</span>
-            </div>
-          {% else %}
-            <div class="info-item">
-              <span class="label">Plano</span>
-              <span class="value">Nenhum plano assinado.</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="profile-section vehicle-info">
-        <div class="section-header">
-          <h2><i class="fas fa-car"></i> Informações do Veículo</h2>
-          <a href="{{ url_for('edit_profile') }}" class="edit-section-btn">
-            <i class="fas fa-edit"></i> Editar
-          </a>
-        </div>
-        <div class="vehicle-card">
-          <div class="vehicle-header">
-            <h3>{{ user.marca }} {{ user.modelo }}</h3>
-            <span class="vehicle-year">{{ user.ano_fabricacao }}</span>
-          </div>
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Cor</span>
-              <span class="value">{{ user.cor }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Placa</span>
-              <span class="value">{{ user.placa }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Renavam</span>
-              <span class="value">{{ user.renavam }}</span>
-            </div>
-          </div>
+        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
+          <h3 class="text-lg font-medium">Horário de Funcionamento</h3>
+          <p>{{ oficina.horario|default('Seg-Sex: 8h às 18h') }}</p>
         </div>
       </div>
     </div>
 
-    <div class="profile-actions">
-      <a href="{{ url_for('home') }}" class="btn btn-secondary">
-        <i class="fas fa-home"></i> Voltar à Home
-      </a>
-      <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+    <div class="profile-footer bg-gray-100 py-4 text-center">
+      <a href="{{ url_for('editar_perfil_oficina') }}" class="btn btn-edit bg-blue-600 text-white py-2 px-6 rounded-full hover:bg-blue-500">
         <i class="fas fa-edit"></i> Editar Perfil
+      </a>
+      <a href="{{ url_for('logout') }}" class="btn btn-logout bg-red-600 text-white py-2 px-6 rounded-full hover:bg-red-500 mt-4 inline-block">
+        <i class="fas fa-sign-out-alt"></i> Sair
       </a>
     </div>
   </div>
 </div>
-<script>
-document.getElementById("logo").addEventListener("change", function(event){
-  var reader = new FileReader();
-  reader.onload = function(e) {
-      document.querySelector(".current-image img").src = e.target.result;
-  };
-  reader.readAsDataURL(event.target.files[0]);
-});
 
-document.getElementById("documento_registro").addEventListener("change", function(event){
-  var reader = new FileReader();
-  reader.onload = function(e) {
-      document.querySelector(".current-image img").src = e.target.result;
-  };
-  reader.readAsDataURL(event.target.files[0]);
-});
-</script>
 <style>
 .profile-container {
   padding: 2rem;

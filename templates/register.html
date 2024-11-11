@@ -20,9 +20,189 @@
             <input type="password" id="password" name="password" required>
         </div>
         <button type="submit" class="btn-primary">Cadastrar</button>
-        <p class="auth-link">
-            Já tem uma conta? <a href="{{ url_for('login') }}">Faça login</a>
-        </p>
     </form>
+    
+    <div class="auth-link">
+        <p>Já tem uma conta? <a href="{{ url_for('login') }}">Faça login</a></p>
+        <p>Ou cadastre-se como <a href="{{ url_for('register_oficina') }}">Oficina</a></p>
+    </div>
 </div>
+<style>/* Estilos gerais */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Estilos do wrapper de autenticação */
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      padding: 2rem;
+    }
+    
+    .auth-container {
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto; /* Centraliza horizontalmente */
+    }
+    
+    .auth-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      padding: 2.5rem;
+    }
+    
+    /* Estilos do cabeçalho de autenticação */
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    .auth-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: #f8f9fa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .auth-icon i {
+      font-size: 2.5rem;
+      color: #1a2a6c;
+    }
+    
+    .auth-header h2 {
+      color: #1a2a6c;
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .auth-subtitle {
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    
+    /* Estilos do formulário */
+    .auth-form {
+      margin-top: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+      border-color: #1a2a6c;
+      box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+      outline: none;
+    }
+    
+    /* Estilos dos botões */
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-register {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-register:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+    
+    .btn-login {
+      background: #1a2a6c;
+      color: white;
+    }
+    
+    .btn-login:hover {
+      background: #151f4d;
+      transform: translateY(-2px);
+    }
+    
+    .btn-login-oficina {
+      background: #6c757d;
+      color: white;
+    }
+    
+    /* Estilos do rodapé de autenticação */
+    .auth-footer {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    
+    .divider {
+      margin: 1.5rem 0;
+      position: relative;
+      text-align: center;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 45%;
+      height: 1px;
+      background: #dee2e6;
+    }
+    
+    .divider::before {
+      left: 0;
+    }
+    
+    .divider::after {
+      right: 0;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .auth-wrapper {
+        padding: 1rem;
+      }
+    
+      .auth-card {
+        padding: 1.5rem;
+      }
+    }</style>
 {% endblock %}

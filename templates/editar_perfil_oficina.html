@@ -9,84 +9,61 @@
         </div>
 
         <form method="POST" enctype="multipart/form-data" class="edit-form">
-            <!-- Informações Pessoais -->
+            <!-- Informações da Oficina -->
             <div class="form-section">
-                <h3><i class="fas fa-user"></i> Informações Pessoais</h3>
+                <h3><i class="fas fa-store"></i> Informações da Oficina</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="username">Nome de usuário</label>
-                        <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                        <label for="nome_oficina">Nome da Oficina</label>
+                        <input type="text" id="nome_oficina" name="nome_oficina" value="{{ oficina.nome_oficina }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                        <label for="email_oficina">Email</label>
+                        <input type="email" id="email_oficina" name="email_oficina" value="{{ oficina.email_oficina }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="text" id="telefone" name="telefone" value="{{ oficina.telefone }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endereco">Endereço</label>
+                        <input type="text" id="endereco" name="endereco" value="{{ oficina.endereco }}" required>
                     </div>
                 </div>
             </div>
 
-            <!-- Informações do Veículo -->
+            <!-- Upload de Logo e Documentos -->
             <div class="form-section">
-                <h3><i class="fas fa-car"></i> Informações do Veículo</h3>
+                <h3><i class="fas fa-upload"></i> Logo e Documentos</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="marca">Marca</label>
-                        <input type="text" id="marca" name="marca" value="{{ user.marca }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="modelo">Modelo</label>
-                        <input type="text" id="modelo" name="modelo" value="{{ user.modelo }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ano_fabricacao">Ano de Fabricação</label>
-                        <input type="text" id="ano_fabricacao" name="ano_fabricacao" value="{{ user.ano_fabricacao }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cor">Cor</label>
-                        <input type="text" id="cor" name="cor" value="{{ user.cor }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="placa">Placa</label>
-                        <input type="text" id="placa" name="placa" value="{{ user.placa }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="renavam">Renavam</label>
-                        <input type="text" id="renavam" name="renavam" value="{{ user.renavam }}" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upload de Documentos -->
-            <div class="form-section">
-                <h3><i class="fas fa-upload"></i> Documentos</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Foto de Perfil</label>
+                        <label>Logo da Oficina</label>
                         <div class="upload-area">
-                            {% if user.foto_perfil %}
+                            {% if oficina.logo %}
                                 <div class="current-image">
-                                    <img src="{{ url_for('static', filename='uploads/' + user.foto_perfil) }}" alt="Foto de Perfil">
+                                    <img src="{{ url_for('static', filename='uploads/' + oficina.logo) }}" alt="Logo da Oficina">
                                 </div>
                             {% endif %}
-                            <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*">
-                            <label for="foto_perfil" class="upload-button">
+                            <input type="file" id="logo" name="logo" accept="image/*">
+                            <label for="logo" class="upload-button">
                                 <i class="fas fa-camera"></i>
-                                Alterar foto
+                                Alterar Logo
                             </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>CRLV do Veículo</label>
+                        <label>Documento de Registro</label>
                         <div class="upload-area">
-                            {% if user.foto_crlv %}
+                            {% if oficina.documento_registro %}
                                 <div class="current-image">
-                                    <img src="{{ url_for('static', filename='uploads/' + user.foto_crlv) }}" alt="CRLV">
+                                    <img src="{{ url_for('static', filename='uploads/' + oficina.documento_registro) }}" alt="Documento de Registro">
                                 </div>
                             {% endif %}
-                            <input type="file" id="foto_crlv" name="foto_crlv" accept="image/*">
-                            <label for="foto_crlv" class="upload-button">
+                            <input type="file" id="documento_registro" name="documento_registro" accept="image/*">
+                            <label for="documento_registro" class="upload-button">
                                 <i class="fas fa-file-upload"></i>
-                                Alterar documento
+                                Alterar Documento
                             </label>
                         </div>
                     </div>
@@ -95,7 +72,7 @@
 
             <!-- Botões de ação -->
             <div class="form-actions">
-                <a href="{{ url_for('perfil') }}" class="btn btn-secondary">
+                <a href="{{ url_for('perfil_oficina') }}" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary">
@@ -279,7 +256,7 @@ input[type="file"] {
     
     .form-grid {
         grid-template-columns: 1fr;
-    }
+    }   
     
     .form-actions {
         flex-direction: column;

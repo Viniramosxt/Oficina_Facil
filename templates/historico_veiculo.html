@@ -1,62 +1,316 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/css/style.css">
-    <title>Histórico de Manutenção do Veículo</title>
-</head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">OFICINA FÁCIL</a>
-            <div class="nav-links">
-                <a href="index.html">Início</a>
-                <a href="manutencao_preventiva.html">Manutenção Preventiva</a>
-                <a href="reparos_emergencia.html">Reparos de Emergência</a>
-                <a href="historico_veiculo.html">Histórico do Veículo</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container">
-        <h1>Histórico de Manutenção do Veículo</h1>
-        <p>Acompanhe todas as manutenções realizadas no seu veículo e tenha um controle completo sobre a saúde do seu carro.</p>
-        
-        <!-- Tabela de histórico de manutenção -->
-        <table class="maintenance-history">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Serviço</th>
-                    <th>Oficina</th>
-                    <th>Descrição</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Exemplo de entrada de manutenção -->
-                <tr>
-                    <td>05/11/2024</td>
-                    <td>Troca de Óleo</td>
-                    <td>Auto Center Brasil</td>
-                    <td>Substituição do óleo do motor e filtro.</td>
-                </tr>
-                <tr>
-                    <td>15/10/2024</td>
-                    <td>Alinhamento e Balanceamento</td>
-                    <td>Oficina Rápida</td>
-                    <td>Serviço de alinhamento e balanceamento das rodas.</td>
-                </tr>
-                <tr>
-                    <td>20/09/2024</td>
-                    <td>Revisão Completa</td>
-                    <td>Car Service</td>
-                    <td>Revisão completa com troca de filtros e verificação geral do sistema.</td>
-                </tr>
-            </tbody>
-        </table>
+{% extends "base.html" %}
+{% block title %}Histórico do Veículo - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="historico-container">
+    <div class="page-header">
+        <h1>Histórico de Manutenção</h1>
+        <p class="subtitle">Acompanhe todas as manutenções realizadas no seu veículo</p>
     </div>
-    <footer>
-        <p>&copy; 2024 Oficina Fácil. Todos os direitos reservados.</p>
-    </footer>
-</body>
-</html>
+
+    <!-- Seção de Filtros e Pesquisa -->
+    <div class="filters-section">
+        <div class="search-box">
+            <input type="text" placeholder="Buscar serviços..." class="search-input">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-status="todos">Todos</button>
+            <button class="filter-btn" data-status="em_andamento">Em andamento</button>
+            <button class="filter-btn" data-status="concluidos">Concluídos</button>
+        </div>
+    </div>
+
+    <!-- Exibição dos Relatórios -->
+    <div class="timeline-container">
+        {% if relatorios %}
+            {% for relatorio in relatorios %}
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <span class="date">{{ relatorio.data.strftime('%d') }}</span>
+                        <span class="month">{{ relatorio.data.strftime('%b') }}</span>
+                        <span class="year">{{ relatorio.data.strftime('%Y') }}</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="service-card">
+                            <div class="service-header">
+                                <h3>{{ relatorio.servico }}</h3>
+                                <span class="oficina-badge">{{ relatorio.oficina.nome }}</span>
+                            </div>
+                            <div class="service-body">
+                                <p>{{ relatorio.descricao }}</p>
+                            </div>
+                            <div class="service-footer">
+                                <button class="details-btn">
+                                    <i class="fas fa-eye"></i> Ver Detalhes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-history empty-icon"></i>
+                <h3>Nenhum histórico encontrado</h3>
+                <p>Você ainda não possui registros de manutenção cadastrados.</p>
+                <a href="{{ url_for('servicos') }}" class="btn-add-registro">
+                    <i class="fas fa-plus"></i> Agendar Manutenção
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            let status = this.getAttribute('data-status');
+            let timelineItems = document.querySelectorAll('.timeline-item');
+
+            // Remover a classe active do botão
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filtrar os itens da linha do tempo
+            timelineItems.forEach(item => {
+                let relatorioStatus = item.getAttribute('data-status');
+                if (status === 'todos' || relatorioStatus === status) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+.historico-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 80px auto 0; /* Ajustado para considerar a navbar fixa */
+    background: var(--primary-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.filters-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.timeline-container {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.timeline-date {
+    min-width: 100px;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-right: 1rem;
+}
+
+.date {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.month, .year {
+    display: block;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.service-header h3 {
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+.oficina-badge {
+    background: var(--secondary-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.service-body p {
+    color: var(--text-color);
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.service-footer {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.details-btn {
+    background: none;
+    border: 1px solid var(--secondary-color);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.details-btn:hover {
+    background: var(--secondary-color);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--text-color);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 1.5rem;
+}
+
+.btn-add-registro {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-add-registro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .historico-container {
+        padding: 1rem;
+    }
+    
+    .timeline-item {
+        flex-direction: column;
+    }
+    
+    .timeline-date {
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+    
+    .filters-section {
+        flex-direction: column;
+    }
+    
+    .search-box {
+        max-width: none;
+    }
+}
+</style>
+{% endblock %}

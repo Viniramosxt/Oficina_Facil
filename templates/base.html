@@ -5,54 +5,284 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}OFICINA FÁCIL{% endblock %}</title>
     
-    <!-- Adicionando o ícone do site (favicon) -->
+    <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
     
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
+    <!-- Barra de Progresso -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Header com Navbar -->
+    <header class="main-header">
+        <!-- Navbar Atualizada -->
+<!-- Navbar Atualizada -->
+<!-- Navbar Atualizada -->
+<nav class="navbar">
+    <div class="container">
+        <!-- Logo e marca -->
+        <div class="brand">
             <a href="{{ url_for('home') }}" class="logo">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Oficina Fácil" class="logo-img">
                 <span>OFICINA FÁCIL</span>
             </a>
-            <!-- Ícone do Menu Hambúrguer -->
-            <div class="menu-icon">&#9776;</div>
+        </div>
+
+        <!-- Menu principal e autenticação -->
+        <div class="nav-wrapper">
+            <!-- Links principais -->
             <div class="nav-links">
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('servicos') }}">Serviços</a>
+                <!-- Links de navegação -->
+                <a href="{{ url_for('home') }}" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('servicos') }}" class="nav-link">
+                    <i class="fas fa-tools"></i>
+                    <span>Serviços</span>
+                </a>
+
+                <!-- Verifica se é cliente ou oficina -->
                 {% if current_user.is_authenticated %}
-                    <!-- Links visíveis apenas para usuários logados -->
-                    <a href="{{ url_for('perfil') }}">Meu Perfil</a>
-                    <a href="{{ url_for('logout') }}">Sair</a>
+                    {% if current_user.is_oficina %}
+                        <!-- Área de navegação para Oficina -->
+                        <div class="user-dropdown">
+                            <button class="user-menu-btn">
+                                <i class="fas fa-wrench"></i>
+                                <span>{{ current_user.username }}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('perfil_oficina') }}" class="dropdown-item">
+                                    <i class="fas fa-cogs"></i>
+                                    Meu Perfil
+                                </a>
+                                <a href="{{ url_for('historico_veiculo') }}" class="dropdown-item">
+                                    <i class="fas fa-history"></i>
+                                    Histórico
+                                </a>
+                                <a href="{{ url_for('servicos') }}" class="dropdown-item">
+                                    <i class="fas fa-car"></i>
+                                    Manutenção
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Área de navegação para Cliente -->
+                        <div class="user-dropdown">
+                            <button class="user-menu-btn">
+                                {% if current_user.foto_perfil %}
+                                    <img src="{{ url_for('static', filename='uploads/' + current_user.foto_perfil) }}" alt="Perfil" class="user-avatar">
+                                {% else %}
+                                    <i class="fas fa-user-circle"></i>
+                                {% endif %}
+                                <span>{{ current_user.username }}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('perfil') }}" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    Meu Perfil
+                                </a>
+                                <a href="{{ url_for('historico_veiculo') }}" class="dropdown-item">
+                                    <i class="fas fa-history"></i>
+                                    Histórico
+                                </a>
+                                <a href="{{ url_for('servicos') }}" class="dropdown-item">
+                                    <i class="fas fa-car"></i>
+                                    Manutenção
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% else %}
-                    <!-- Links visíveis apenas para visitantes -->
-                    <a href="{{ url_for('login') }}">Login</a>
-                    <a href="{{ url_for('register') }}" class="btn-register">Cadastre-se</a>
+                    <div class="auth-buttons">
+                        <div class="dropdown">
+                            <button class="auth-btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Entrar</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('login') }}" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    Login Cliente
+                                </a>
+                                <a href="{{ url_for('login_oficina') }}" class="dropdown-item">
+                                    <i class="fas fa-wrench"></i>
+                                    Login Oficina
+                                </a>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('register') }}" class="auth-btn register-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Cadastre-se</span>
+                        </a>
+                    </div>
                 {% endif %}
             </div>
-        </div>
-    </nav>
 
-    <main class="container">
+            <!-- Menu mobile -->
+            <button class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                        <button type="button" class="close-alert">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="main-footer">
         <div class="container">
-            <p>© 2024 OFICINA FÁCIL. Todos os direitos reservados.</p>
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Sobre Nós</h3>
+                    <p>OFICINA FÁCIL - Sua plataforma completa para gestão e manutenção veicular.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Links Úteis</h3>
+                    <ul>
+                        <li><a href="#">Como Funciona</a></li>
+                        <li><a href="#">Planos</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-phone"></i> (11) 99999-9999</li>
+                        <li><i class="fas fa-envelope"></i> contato@oficinafacil.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> São Paulo, SP</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Redes Sociais</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 OFICINA FÁCIL. Todos os direitos reservados.</p>
+            </div>
         </div>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {% block extra_js %}{% endblock %}
+    
     <script>
-      // Script para alternar a classe 'mobile' no menu
-      $(document).ready(function(){
-        $(".menu-icon").click(function(){
-          $(".nav-links").toggleClass("mobile");
+    document.addEventListener('DOMContentLoaded', function() {
+        // Progress Bar
+        const progressBar = document.getElementById('progressBar');
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + "%";
+        };
+
+        // Mobile Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        menuToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
         });
-      });
+
+        // User Dropdown
+        const userMenuBtn = document.querySelector('.user-menu-btn');
+        if (userMenuBtn) {
+            userMenuBtn.addEventListener('click', function() {
+                this.parentElement.classList.toggle('active');
+            });
+        }
+
+        // Close Flash Messages
+        document.querySelectorAll('.close-alert').forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+
+        // Dropdown Menu
+        document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+            dropdown.addEventListener('click', function() {
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-menu')) {
+                document.querySelectorAll('.user-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
+            }
+        });
+    });
     </script>
 </body>
 </html>
+
