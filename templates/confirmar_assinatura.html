@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Assinatura - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Confirmar Assinatura</h2>
+            <p>Você está prestes a assinar o seguinte plano:</p>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ plano.nome }}</h5>
+                    <p class="card-text">Preço: R$ {{ plano.preco }}</p>
+                    <ul>
+                        {% for feature in plano.features %}
+                        <li>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                    <form method="POST" action="{{ url_for('confirmar_assinatura', plano_id=plano.id) }}">
+                        <button type="submit" class="btn btn-success">Confirmar Assinatura</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

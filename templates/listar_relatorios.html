@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Relatórios</h1>
+    {% if relatorios %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Serviço</th>
+                    <th>Cliente</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for relatorio in relatorios %}
+                    <tr>
+                        <td>{{ relatorio.data.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ relatorio.servico }}</td>
+                        <td>{{ relatorio.cliente.nome }}</td>
+                        <td>
+                            <a href="{{ url_for('visualizar_relatorio', id=relatorio.id) }}" class="btn btn-primary">Visualizar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum relatório encontrado.</p>
+    {% endif %}
+{% endblock %}

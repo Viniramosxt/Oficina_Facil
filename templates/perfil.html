@@ -45,19 +45,16 @@
       <div class="profile-section plan-info">
         <div class="section-header">
           <h2><i class="fas fa-cogs"></i> Plano Assinado</h2>
-          <a href="{{ url_for('edit_profile') }}" class="edit-section-btn">
-            <i class="fas fa-edit"></i> Editar
-          </a>
         </div>
         <div class="info-grid">
-          {% if user.plano_assinado %}
+          {% if current_user.plano_assinado %}
             <div class="info-item">
               <span class="label">Plano</span>
-              <span class="value">{{ user.plano_assinado.nome }}</span>
+              <span class="value">{{ current_user.plano_assinado.nome }}</span>
             </div>
             <div class="info-item">
               <span class="label">Preço</span>
-              <span class="value">R$ {{ user.plano_assinado.preco }} por mês</span>
+              <span class="value">R$ {{ current_user.plano_assinado.preco }} por mês</span>
             </div>
           {% else %}
             <div class="info-item">

@@ -1,301 +1,364 @@
 {% extends "base.html" %}
-
 {% block title %}Perfil da Oficina - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="profile-container max-w-4xl mx-auto px-4 py-6">
-  <div class="profile-card bg-white shadow-lg rounded-lg overflow-hidden">
-    <div class="profile-header text-center py-6 bg-gray-200">
-      <!-- Logo da Oficina, se houver, substitua o link do placeholder -->
-      <img src="{{ oficina.logo_url or '/api/placeholder/150/150' }}" alt="Logo da Oficina" class="profile-img mb-6 rounded-full w-32 h-32 mx-auto">
-      <h2 class="text-xl font-semibold">{{ oficina.nome }}</h2>
-      <p class="email text-gray-600">{{ oficina.email }}</p>
-    </div>
+<div class="profile-container">
+    <div class="profile-card">
+        <!-- Header com Background Gradiente -->
+        <div class="profile-header">
+            <div class="cover-photo"></div>
+            <div class="profile-info">
+              <div class="profile-photo">
+                {% if oficina.logo %}
+                    <img src="{{ url_for('static', filename='uploads/' + oficina.logo) }}" 
+                         alt="Logo da Oficina"
+                         onerror="this.src='/api/placeholder/150/150'; this.onerror=null;"
+                         class="profile-img">
+                {% else %}
+                    <img src="/api/placeholder/150/150" 
+                         alt="Logo da Oficina"
+                         class="profile-img">
+                {% endif %}
+                <a href="{{ url_for('editar_perfil_oficina') }}" class="edit-photo">
+                    <i class="fas fa-camera"></i>
+                </a>
+            </div>
+                <h1>{{ oficina.nome }}</h1>
+                <p class="email">{{ oficina.email }}</p>
+                <div class="quick-stats">
+                    <div class="stat">
+                        <i class="fas fa-star"></i>
+                        <span>{{ "%.1f"|format(oficina.avaliacao|default(5.0)) }}/5.0</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-tools"></i>
+                        <span>{{ oficina.atendimentos|default(0) }} atendimentos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="profile-body px-6 py-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-medium">Atendimentos</h3>
-          <p class="stat-number text-2xl">{{ oficina.atendimentos|default(0) }}</p>
-        </div>
-        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-medium">Avaliação</h3>
-          <p class="stat-number text-2xl">{{ "%.1f"|format(oficina.avaliacao|default(5.0)) }}/5.0</p>
-        </div>
-        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-medium">Especialidades</h3>
-          <div class="tags">
-            {% for esp in oficina.especialidades|default(['Mecânica Geral']) %}
-              <span class="tag bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">{{ esp }}</span>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="stat-card bg-gray-50 p-4 rounded-lg shadow">
-          <h3 class="text-lg font-medium">Horário de Funcionamento</h3>
-          <p>{{ oficina.horario|default('Seg-Sex: 8h às 18h') }}</p>
-        </div>
-      </div>
-    </div>
+        <!-- Cards de Informações -->
+        <div class="info-section">
+            <div class="info-grid">
+                <!-- Card de Especialidades -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-wrench"></i>
+                        <h3>Especialidades</h3>
+                    </div>
+                    <div class="tags-container">
+                        {% for esp in oficina.especialidades|default(['Mecânica Geral', 'Elétrica', 'Funilaria']) %}
+                            <span class="tag">{{ esp }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
 
-    <div class="profile-footer bg-gray-100 py-4 text-center">
-      <a href="{{ url_for('editar_perfil_oficina') }}" class="btn btn-edit bg-blue-600 text-white py-2 px-6 rounded-full hover:bg-blue-500">
-        <i class="fas fa-edit"></i> Editar Perfil
-      </a>
-      <a href="{{ url_for('logout') }}" class="btn btn-logout bg-red-600 text-white py-2 px-6 rounded-full hover:bg-red-500 mt-4 inline-block">
-        <i class="fas fa-sign-out-alt"></i> Sair
-      </a>
+                <!-- Card de Horários -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>Horário de Funcionamento</h3>
+                    </div>
+                    <div class="schedule">
+                        <p>{{ oficina.horario|default('Segunda a Sexta: 8h às 18h') }}</p>
+                        <p>{{ oficina.horario_fds|default('Sábado: 8h às 12h') }}</p>
+                    </div>
+                </div>
+
+                <!-- Card de Contato -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Contato</h3>
+                    </div>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> {{ oficina.email }}</p>
+                        <p><i class="fas fa-phone"></i> {{ oficina.telefone|default('(11) 9999-9999') }}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ oficina.endereco|default('Endereço não informado') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="profile-actions">
+            <a href="{{ url_for('editar_perfil_oficina') }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i>
+                Editar Perfil
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i>
+                Sair
+            </a>
+        </div>
     </div>
-  </div>
 </div>
 
 <style>
 .profile-container {
-  padding: 2rem;
-  background: var(--background-color); /* Usando a variável de cor de fundo do tema */
-  min-height: 100vh;
-  padding-top: 80px;
+    padding: 2rem;
+    min-height: 100vh;
+    background: #f0f2f5;
+    padding-top: 80px;
 }
 
 .profile-card {
-  max-width: 800px;
-  margin: 0 auto;
-  background: var(--primary-color);
-  border-radius: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-/* Se necessário, ajuste também o body para garantir consistência */
-body {
-  background-color: var(--background-color);
-  min-height: 100vh;
-}
-
-/* E para a seção de conteúdo principal */
-.main-content {
-  background-color: var(--background-color);
-  min-height: 100vh;
-}
-
+/* Header Estilizado */
 .profile-header {
-  position: relative;
-  text-align: center;
-  padding-bottom: 2rem;
+    position: relative;
+    padding-bottom: 2rem;
 }
 
-.profile-cover {
-  height: 200px;
-  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+.cover-photo {
+    height: 200px;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    position: relative;
 }
 
-.profile-avatar {
-  position: relative;
-  margin-top: -75px;
-  display: inline-block;
+.profile-info {
+    text-align: center;
+    margin-top: -75px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-photo {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-photo img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    background: white;
 }
 
 .profile-img {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 5px solid var(--primary-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  object-fit: cover;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    background: white;
 }
 
-.change-photo-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: var(--secondary-color);
-  color: var(--text-color);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+.edit-photo {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 35px;
+    height: 35px;
+    background: #007bff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-.change-photo-btn:hover {
-  background: var(--hover-color);
-  transform: scale(1.1);
+.edit-photo:hover {
+    transform: scale(1.1);
+    background: #0056b3;
 }
 
-.profile-header h1 {
-  margin: 1rem 0 0.5rem;
-  color: var(--text-color);
-  font-size: 1.8rem;
+.profile-info h1 {
+    margin: 1rem 0 0.5rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
 }
 
-.user-email {
-  color: var(--text-color);
-  opacity: 0.8;
-  margin-bottom: 0.5rem;
+.email {
+    color: #666;
+    margin-bottom: 1rem;
 }
 
-.member-since {
-  color: var(--text-color);
-  opacity: 0.6;
-  font-size: 0.9rem;
+/* Quick Stats */
+.quick-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1rem 0;
 }
 
-.profile-content {
-  padding: 2rem;
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
 }
 
-.profile-section {
-  margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 1.5rem;
+.stat i {
+    color: #007bff;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.section-header h2 {
-  font-size: 1.2rem;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.edit-section-btn {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  text-decoration: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  opacity: 0.8;
-}
-
-.edit-section-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  opacity: 1;
+/* Info Section */
+.info-section {
+    padding: 2rem;
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
 }
 
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.info-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
-.label {
-  color: var(--text-color);
-  opacity: 0.7;
-  font-size: 0.9rem;
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.value {
-  color: var(--text-color);
-  font-weight: 500;
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
 }
 
-.vehicle-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 1.5rem;
+.card-header i {
+    font-size: 1.5rem;
+    color: #007bff;
 }
 
-.vehicle-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.card-header h3 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin: 0;
 }
 
-.vehicle-header h3 {
-  color: var(--text-color);
-  font-size: 1.2rem;
+/* Tags */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.vehicle-year {
-  background: var(--secondary-color);
-  color: var(--text-color);
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+.tag {
+    background: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
 }
 
+/* Schedule */
+.schedule p {
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+/* Contact Info */
+.contact-info p {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #666;
+    margin: 0.8rem 0;
+}
+
+.contact-info i {
+    color: #007bff;
+    width: 20px;
+}
+
+/* Actions */
 .profile-actions {
-  padding: 2rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid #eee;
 }
 
 .btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .btn-primary {
-  background: var(--secondary-color);
-  color: var(--text-color);
+    background: #007bff;
+    color: white;
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-color);
+.btn-danger {
+    background: #dc3545;
+    color: white;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.info-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.info-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.info-card:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
-  .profile-container {
-    padding: 1rem;
-    padding-top: 80px;
-  }
-  
-  .profile-content {
-    padding: 1rem;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-actions {
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .btn {
-    width: 100%;
-    justify-content: center;
-  }
+    .profile-container {
+        padding: 1rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .quick-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
 </style>
 {% endblock %}

@@ -9,7 +9,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     
     # Informações do veículo
@@ -40,8 +40,9 @@ class Plano(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     preco = db.Column(db.Float, nullable=False)
+    features = db.Column(db.PickleType, nullable=False)
 
-    # Relacionamento com o usuário
+    # Relationship with the User model
     usuarios = db.relationship('User', backref='plano_assinado', lazy=True)
 
     def __repr__(self):
@@ -55,27 +56,45 @@ class Oficina(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha_hash = db.Column(db.String(100), nullable=False)
-    cnpj = db.Column(db.String(14), unique=True, nullable=False)
+    cnpj = db.Column(db.String(18), unique=True, nullable=False)
     endereco = db.Column(db.String(255))
-    contato = db.Column(db.String(50))
-    lat = db.Column(db.Float, nullable=True)  # Latitude
-    lon = db.Column(db.Float, nullable=True)  # Longitude
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # Relacionamento com funcionários
-    funcionarios = db.relationship('Funcionario', backref='oficina', lazy=True)
+    telefone = db.Column(db.String(50))
+    logo = db.Column(db.String(255), nullable=True)
+    lat = db.Column(db.Float, nullable=True)
+    lon = db.Column(db.Float, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    atendimentos = db.Column(db.Integer, default=0)
+    avaliacao = db.Column(db.Float, default=5.0)
+    especialidades = db.Column(db.Text)
+    horario = db.Column(db.String(255))
+    horario_fds = db.Column(db.String(255))
 
-    # Relacionamento com os relatórios gerados pela oficina
+    funcionarios = db.relationship('Funcionario', backref='oficina', lazy=True)
     relatorios = db.relationship('Relatorio', backref='oficina', lazy=True)
 
-    def __init__(self, nome, email, senha, cnpj, endereco=None, contato=None, lat=None, lon=None):
+    def __init__(self, nome, email, senha, cnpj, endereco=None, telefone=None, 
+                 lat=None, lon=None, especialidades=None, horario=None, 
+                 horario_fds=None, logo=None):
         self.nome = nome
         self.email = email
-        self.senha_hash = senha
+        self.set_password(senha)
         self.cnpj = cnpj
         self.endereco = endereco
-        self.contato = contato
+        self.telefone = telefone
         self.lat = lat
         self.lon = lon
+        self.especialidades = especialidades
+        self.horario = horario
+        self.horario_fds = horario_fds
+        self.logo = logo
+        self.atendimentos = 0
+        self.avaliacao = 5.0
+
+    def set_password(self, password):
+        self.senha_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.senha_hash, password)
 
     def __repr__(self):
         return f'<Oficina {self.nome}>'

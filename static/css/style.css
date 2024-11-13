@@ -792,3 +792,19 @@ footer {
       height: 300px;
   }
 }
+
+.plans-section .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.plans-section .plan-card {
+  background: var(--primary-color);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  position: relative;
+}
