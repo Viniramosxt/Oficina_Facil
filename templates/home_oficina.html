@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Home Oficina - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="main-wrapper">
+    <section class="section">
+        <div class="section-header">
+            <h2>Bem-vindo, {{ current_user.nome }}</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="content">
+            <p>Gerencie sua oficina e veja os relatórios de manutenção.</p>
+            <a href="{{ url_for('listar_relatorios') }}" class="btn btn-primary">Ver Relatórios</a>
+            <a href="{{ url_for('cadastrar_funcionario') }}" class="btn btn-secondary">Cadastrar Funcionário</a>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Main Wrapper */
+.main-wrapper {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Section Styles */
+.section {
+    padding: 5rem 2rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.section-divider {
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+.content {
+    text-align: center;
+}
+
+.content p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.btn-secondary {
+    background: var(--accent-color);
+    color: var(--primary-color);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section-header h2 {
+        font-size: 2rem;
+    }
+
+    .content p {
+        font-size: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}

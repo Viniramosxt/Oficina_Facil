@@ -1,91 +1,294 @@
-<!-- criar_relatorio.html -->
 {% extends "base.html" %}
+
 {% block title %}Criar Relatório - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="container report-container">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="card-title mb-0">Criar Relatório</h2>
+<div class="report-wrapper">
+    <div class="report-container">
+        <div class="report-card">
+            <!-- Cabeçalho -->
+            <div class="card-header">
+                <div class="header-icon">
+                    <i class="fas fa-file-medical"></i>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('criar_relatorio') }}">
-                        <div class="mb-3">
-                            <label for="servico" class="form-label">Serviço</label>
-                            <input type="text" class="form-control" id="servico" name="servico" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="descricao" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="cliente" class="form-label">Cliente</label>
-                            <select class="form-select" id="cliente" name="id_cliente" required>
-                                <option value="">Selecione um cliente...</option>
-                                {% for cliente in clientes %}
-                                <option value="{{ cliente.id }}">{{ cliente.username }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Criar Relatório</button>
-                    </form>
-                </div>
+                <h2>Criar Relatório</h2>
+                <p class="subtitle">Preencha os detalhes do serviço realizado</p>
             </div>
+
+            <!-- Formulário -->
+            <form class="report-form" method="POST" action="{{ url_for('criar_relatorio') }}">
+                <!-- Cliente -->
+                <div class="form-group">
+                    <label for="cliente">
+                        <i class="fas fa-user"></i>
+                        Cliente
+                    </label>
+                    <select id="cliente" name="id_cliente" required class="form-select">
+                        <option value="">Selecione um cliente...</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Tipo de Serviço -->
+                <div class="form-group">
+                    <label for="servico">
+                        <i class="fas fa-tools"></i>
+                        Tipo de Serviço
+                    </label>
+                    <select id="servico" name="servico" required class="form-select">
+                        <option value="">Selecione o serviço...</option>
+                        <option value="revisao">Revisão Geral</option>
+                        <option value="manutencao">Manutenção Preventiva</option>
+                        <option value="reparo">Reparo Específico</option>
+                        <option value="eletrica">Sistema Elétrico</option>
+                        <option value="motor">Motor</option>
+                        <option value="freios">Sistema de Freios</option>
+                        <option value="suspensao">Suspensão</option>
+                    </select>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group">
+                    <label for="descricao">
+                        <i class="fas fa-comment-alt"></i>
+                        Descrição Detalhada
+                    </label>
+                    <textarea id="descricao" name="descricao" rows="4" required 
+                              placeholder="Descreva detalhadamente o serviço realizado..."></textarea>
+                </div>
+
+                <!-- Funcionário -->
+                <div class="form-group">
+                    <label for="id_funcionario">
+                        <i class="fas fa-user-tie"></i>
+                        Funcionário
+                    </label>
+                    <select id="id_funcionario" name="id_funcionario" required class="form-select">
+                        <option value="">Selecione um funcionário...</option>
+                        {% for funcionario in funcionarios %}
+                            <option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botões -->
+                <div class="form-actions">
+                    <a href="{{ url_for('listar_relatorios') }}" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Criar Relatório
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <style>
-    .report-container {
-        padding: 40px 0;
+/* Wrapper */
+.report-wrapper {
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.report-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.report-card {
+    background: rgba(31, 42, 68, 0.95);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header */
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-icon i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.card-header h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--gray);
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Form */
+.report-form {
+    margin-top: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group label i {
+    color: var(--accent-color);
+}
+
+.form-select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.form-select option {
+    background: var(--primary-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+}
+
+.form-select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: flex-end;
+}
+
+.btn-primary,
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .report-wrapper {
+        padding: 1rem;
     }
 
-    .card {
-        border-radius: 15px;
-        border: none;
-        transition: transform 0.2s ease;
+    .report-card {
+        padding: 1.5rem;
     }
 
-    .card:hover {
-        transform: translateY(-5px);
+    .form-actions {
+        flex-direction: column;
     }
 
-    .card-header {
-        border-radius: 15px 15px 0 0 !important;
-        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
     }
-
-    .form-label {
-        font-weight: 500;
-        color: #2c3e50;
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-        padding: 10px 15px;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-
-    .btn-primary {
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
-    }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona classes de validação aos campos
+    const form = document.querySelector('.report-form');
+    const inputs = form.querySelectorAll('select, textarea');
+
+    inputs.forEach(input => {
+        input.addEventListener('invalid', function(e) {
+            e.preventDefault();
+            this.classList.add('invalid');
+        });
+
+        input.addEventListener('input', function() {
+            if (this.classList.contains('invalid')) {
+                this.classList.remove('invalid');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

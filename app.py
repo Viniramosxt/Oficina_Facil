@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from config import Config
 from extensions import db  # Aqui você já tem o db, então remova 'migrate' da importação
 from flask_migrate import Migrate  # Importe o Migrate
-from models import User,Funcionario,Oficina,Relatorio, Plano
+from models import User, Funcionario, Oficina, Relatorio, Plano
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os  # Adicionando a importação do módulo os para manipulação de arquivos
@@ -24,6 +24,9 @@ app.config.from_object(Config)
 # Defina a chave secreta para sessões
 app.secret_key = 'sua_chave_secreta_muito_segura_aqui'  # Altere isso para uma chave segura
 
+# Configuração do diretório de upload
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+
 # Inicialização do Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -31,20 +34,31 @@ login_manager.login_view = 'login'  # Define a página de login para redireciona
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    # Tenta carregar como usuário primeiro
+    user = User.query.get(int(user_id))
+    if user:
+        return user
+    # Se não encontrar usuário, tenta carregar como oficina
+    return Oficina.query.get(int(user_id))
 
 # Inicialize o banco de dados e o Flask-Migrate
 db.init_app(app)
 migrate = Migrate(app, db)  # Inicializa o Migrate com a aplicação e o banco de dados
 
+# Importar as rotas
+import routes
+
 # Rota inicial
 @app.route('/')
 def home():
     if current_user.is_authenticated:
-        return render_template('index.html')  # Exibe conteúdo para usuários logados
+        if session.get('tipo_usuario') == 'cliente':
+            return redirect(url_for('home_cliente'))
+        elif session.get('tipo_usuario') == 'oficina':
+            return redirect(url_for('home_oficina'))
     else:
         mensagem = "OFICINA FÁCIL oferece planos de saúde para veículos."
-        return render_template('index.html', mensagem=mensagem)  # Exibe conteúdo para visitantes
+        return render_template('index.html', mensagem=mensagem)
 
 # Rota de Login
 @app.route('/login', methods=['GET', 'POST'])
@@ -55,22 +69,35 @@ def login():
 
         if username and password:
             user = User.query.filter_by(username=username).first()
-            if user:
-                print(f"Usuário encontrado: {user.username}")
-            else:
-                print("Usuário não encontrado.")
-            
             if user and check_password_hash(user.password, password):
                 login_user(user)
-                print(f"Usuário logado: {current_user.username}")
-                return redirect(url_for('perfil'))  # Verifique se essa rota está correta
+                session['tipo_usuario'] = 'cliente'
+                return redirect(url_for('home_cliente'))  # Redireciona para a home do cliente
             else:
-                print("Falha na autenticação - credenciais inválidas.")
                 flash('Credenciais inválidas.', 'danger')
         else:
             flash('Por favor, preencha todos os campos.', 'danger')
 
     return render_template('login.html')
+
+@app.route('/login_oficina', methods=['GET', 'POST'])
+def login_oficina():
+    if request.method == 'POST':
+        cnpj = request.form.get('cnpj')
+        senha = request.form.get('password')
+        
+        oficina = Oficina.query.filter_by(cnpj=cnpj).first()
+        
+        if oficina and oficina.check_password(senha):
+            login_user(oficina)
+            session['oficina_id'] = oficina.id
+            session['tipo_usuario'] = 'oficina'
+            flash('Login realizado com sucesso!', 'success')
+            return redirect(url_for('home_oficina'))  # Redireciona para a home da oficina
+        else:
+            flash('CNPJ ou senha inválidos.', 'danger')
+
+    return render_template('login_oficina.html')
 
 @app.route('/logout')
 @login_required
@@ -111,7 +138,7 @@ def register():
 @login_required
 def servicos():
     # Se o usuário já tem um plano assinado, redireciona para agendar_manutencao
-    if current_user.plano_assinado_id:
+    if (current_user.plano_assinado_id):
         return redirect(url_for('agendar_manutencao'))
     # Se não tem plano, mostra a página de planos
     planos = Plano.query.all()
@@ -121,7 +148,7 @@ def servicos():
 @app.route('/perfil')
 @login_required
 def perfil():
-    if session.get('oficina_id'):
+    if session.get('tipo_usuario') == 'oficina':
         # Se for uma oficina logada
         oficina = Oficina.query.get(session['oficina_id'])
         return render_template('perfil_oficina.html', oficina=oficina)
@@ -213,13 +240,19 @@ def agendar_manutencao():
         servico = request.form.get('servico')
         descricao = request.form.get('descricao')
         
+        # Seleciona um funcionário válido da oficina
+        funcionario = Funcionario.query.filter_by(id_oficina=oficina_id).first()
+        if not funcionario:
+            flash('Nenhum funcionário disponível para a oficina selecionada.', 'danger')
+            return redirect(url_for('agendar_manutencao'))
+
         novo_relatorio = Relatorio(
             servico=servico,
             descricao=descricao,
             data=datetime.strptime(data, '%Y-%m-%d'),
             id_cliente=current_user.id,
             id_oficina=oficina_id,
-            id_funcionario=1
+            id_funcionario=funcionario.id  # Usa o ID do funcionário válido
         )
         
         try:
@@ -253,12 +286,14 @@ def criar_relatorio():
         servico = request.form.get('servico')
         descricao = request.form.get('descricao')
         id_cliente = request.form.get('id_cliente')
+        id_funcionario = request.form.get('id_funcionario')
 
         novo_relatorio = Relatorio(
             servico=servico,
             descricao=descricao,
             id_cliente=id_cliente,
             id_oficina=oficina_id,
+            id_funcionario=id_funcionario,
             data=datetime.now()
         )
 
@@ -271,9 +306,10 @@ def criar_relatorio():
             db.session.rollback()
             flash(f'Erro ao criar relatório: {str(e)}', 'danger')
 
-    # Busca todos os clientes para o select
+    # Busca todos os clientes e funcionários para o select
     clientes = User.query.filter_by(tipo='cliente').all()
-    return render_template('criar_relatorio.html', clientes=clientes)
+    funcionarios = Funcionario.query.filter_by(id_oficina=oficina_id).all()
+    return render_template('criar_relatorio.html', clientes=clientes, funcionarios=funcionarios)
 
 @app.route('/listar_relatorios')
 @login_required
@@ -298,8 +334,9 @@ def visualizar_relatorio(id):
     relatorio = Relatorio.query.get_or_404(id)
 
     # Verificar se o usuário tem permissão para ver o relatório
-    if not (current_user.id == relatorio.id_cliente or
-            (current_user.oficina and current_user.oficina.id == relatorio.id_oficina)):
+    if session.get('tipo_usuario') == 'cliente' and current_user.id != relatorio.id_cliente:
+        abort(403)
+    elif session.get('tipo_usuario') == 'oficina' and session.get('oficina_id') != relatorio.id_oficina:
         abort(403)
 
     return render_template('visualizar_relatorio.html', relatorio=relatorio)
@@ -358,25 +395,6 @@ def obter_oficina(user_id):
     return oficina
 
 
-@app.route('/login_oficina', methods=['GET', 'POST'])
-def login_oficina():
-    if request.method == 'POST':
-        cnpj = request.form.get('cnpj')
-        senha = request.form.get('password')
-        
-        oficina = Oficina.query.filter_by(cnpj=cnpj).first()
-        
-        if oficina and oficina.check_password(senha):
-            # Armazena o ID da oficina na sessão
-            session['oficina_id'] = oficina.id
-            session['tipo_usuario'] = 'oficina'  # Marca como usuário tipo oficina
-            flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('perfil_oficina'))
-        else:
-            flash('CNPJ ou senha inválidos.', 'danger')
-
-    return render_template('login_oficina.html')
-
 
 @app.route('/register_oficina', methods=['GET', 'POST'])
 def register_oficina():
@@ -418,6 +436,7 @@ def perfil_oficina():
         return redirect(url_for('login_oficina'))
         
     oficina = Oficina.query.get_or_404(oficina_id)
+    app.logger.info(f'Logo da oficina: {oficina.logo}')
 
     if request.method == 'POST':
         # Lógica de atualização do perfil
@@ -442,6 +461,19 @@ def perfil_oficina():
         return redirect(url_for('perfil_oficina'))
 
     return render_template('perfil_oficina.html', oficina=oficina)
+
+
+@app.route('/ver_perfil_oficina', methods=['GET'])
+def ver_perfil_oficina():
+    oficina_id = session.get('oficina_id')
+    if not oficina_id:
+        flash('Faça login para ver o perfil.', 'warning')
+        return redirect(url_for('login_oficina'))
+        
+    oficina = Oficina.query.get_or_404(oficina_id)
+    app.logger.info(f'Logo da oficina: {oficina.logo}')
+
+    return render_template('ver_perfil_oficina.html', oficina=oficina)
 
 @app.route('/cadastrar_funcionario', methods=['GET', 'POST'])
 def cadastrar_funcionario():
@@ -481,7 +513,7 @@ def listar_funcionarios():
         return redirect(url_for('home'))
         
     funcionarios = Funcionario.query.filter_by(id_oficina=oficina_id).all()
-    return render_template('funcionarios/listar.html', funcionarios=funcionarios)
+    return render_template('listar_funcionarios.html', funcionarios=funcionarios)
 
 @app.route('/funcionarios/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -548,17 +580,19 @@ def editar_perfil_oficina():
     
     if request.method == 'POST':
         try:
-            oficina.nome_oficina = request.form.get('nome_oficina')
-            oficina.email_oficina = request.form.get('email_oficina')
+            oficina.nome = request.form.get('nome')
+            oficina.email = request.form.get('email')
             oficina.telefone = request.form.get('telefone')
             oficina.endereco = request.form.get('endereco')
             oficina.horario = request.form.get('horario')
             oficina.horario_fds = request.form.get('horario_fds')
-            oficina.especialidades = request.form.get('especialidades')
+            oficina.especialidades = request.form.getlist('especialidades')
             
             if 'logo' in request.files:
                 file = request.files['logo']
+                app.logger.info(f'Arquivo recebido: {file.filename}')
                 if file and file.filename != '' and allowed_file(file.filename):
+                    app.logger.info(f'Tipo de arquivo permitido: {file.filename}')
                     if oficina.logo:
                         old_logo_path = os.path.join(app.config['UPLOAD_FOLDER'], oficina.logo)
                         if os.path.exists(old_logo_path):
@@ -569,6 +603,9 @@ def editar_perfil_oficina():
                     filename = f"{timestamp}_{filename}"
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     oficina.logo = filename
+                    app.logger.info(f'Logo salva em: {filename}')
+                else:
+                    app.logger.info('Nenhum arquivo de logo foi enviado ou o arquivo não é permitido.')
 
             db.session.commit()
             flash('Perfil atualizado com sucesso!', 'success')
@@ -576,6 +613,7 @@ def editar_perfil_oficina():
             
         except Exception as e:
             db.session.rollback()
+            app.logger.error(f'Erro ao atualizar perfil: {str(e)}')
             flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
             
     return render_template('editar_perfil_oficina.html', oficina=oficina)
@@ -591,16 +629,17 @@ def check_password(self, password):
 def utility_processor():
     def get_oficina():
         if session.get('oficina_id'):
-            return Oficina.query.get(session['oficina_id'])
+            return Oficina.query.get(session.get('oficina_id'))
         return None
 
-    def is_oficina():  # Agora é uma função que retorna um booleano
-        return bool(session.get('oficina_id') and session.get('tipo_usuario') == 'oficina')
+    def is_oficina():
+        return 'oficina_id' in session
 
     return {
-        'oficina': get_oficina(),
-        'is_oficina': is_oficina  # Retorna a função, não o resultado
+        'get_oficina': get_oficina,
+        'is_oficina': is_oficina
     }
+
 # No app.py, antes do app.run()
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])

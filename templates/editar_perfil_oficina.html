@@ -14,12 +14,12 @@
                 <h3><i class="fas fa-store"></i> Informações da Oficina</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="nome_oficina">Nome da Oficina</label>
-                        <input type="text" id="nome_oficina" name="nome_oficina" value="{{ oficina.nome_oficina }}" required>
+                        <label for="nome">Nome da Oficina</label>
+                        <input type="text" id="nome" name="nome" value="{{ oficina.nome }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="email_oficina">Email</label>
-                        <input type="email" id="email_oficina" name="email_oficina" value="{{ oficina.email_oficina }}" required>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ oficina.email }}" required>
                     </div>
                     <div class="form-group">
                         <label for="telefone">Telefone</label>
@@ -28,6 +28,18 @@
                     <div class="form-group">
                         <label for="endereco">Endereço</label>
                         <input type="text" id="endereco" name="endereco" value="{{ oficina.endereco }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horario">Horário de Funcionamento</label>
+                        <input type="text" id="horario" name="horario" value="{{ oficina.horario }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="horario_fds">Horário de Funcionamento (FDS)</label>
+                        <input type="text" id="horario_fds" name="horario_fds" value="{{ oficina.horario_fds }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="especialidades">Especialidades</label>
+                        <input type="text" id="especialidades" name="especialidades" value="{{ oficina.especialidades if oficina.especialidades else '' }}">
                     </div>
                 </div>
             </div>

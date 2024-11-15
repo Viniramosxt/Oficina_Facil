@@ -34,12 +34,12 @@
                             <i class="fas fa-edit"></i>
                         </a>
                         <button 
-    data-funcionario-id="{{ funcionario.id }}" 
-    class="btn-delete" 
-    title="Deletar"
-    onclick="confirmarDelecao(this.dataset.funcionarioId)">
-    <i class="fas fa-trash"></i>
-</button>
+                            data-funcionario-id="{{ funcionario.id }}" 
+                            class="btn-delete" 
+                            title="Deletar"
+                            onclick="confirmarDelecao(this.dataset.funcionarioId)">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -48,10 +48,6 @@
                         <div class="stat-item">
                             <i class="fas fa-clipboard-list"></i>
                             <span>{{ funcionario.relatorios|length }} relatórios</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-calendar-check"></i>
-                            <span>Desde {{ funcionario.created_at.strftime('%d/%m/%Y') }}</span>
                         </div>
                     </div>
                 </div>
@@ -334,5 +330,5 @@
             closeModal();
         }
     }
-    </script>
+</script>
 {% endblock %}

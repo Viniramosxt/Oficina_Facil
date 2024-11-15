@@ -3,7 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     locationButton.addEventListener("click", () => {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
+            navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                enableHighAccuracy: true, // Habilitar alta precisão
+                timeout: 20000, // Tempo limite de 20 segundos
+                maximumAge: 0 // Não usar cache
+            });
         } else {
             alert("Geolocation is not supported by this browser.");
         }
@@ -22,9 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.officinas && data.officinas.length > 0) {
-                    data.officinas.forEach(officina => {
+                    data.officinas.forEach(oficina => {
                         // Adiciona cada oficina no mapa
-                        addOfficinaMarker(officina.lat, officina.lon, officina.nome);
+                        addOfficinaMarker(oficina.lat, oficina.lon, oficina.nome);
                     });
                 } else {
                     alert("Nenhuma oficina próxima encontrada.");
@@ -57,20 +61,45 @@ document.addEventListener("DOMContentLoaded", function () {
             container: 'map', // ID do elemento onde o mapa será exibido
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [lon, lat], // Coordenadas centrais do mapa
-            zoom: 12 // Nível de zoom
+            zoom: 15 // Nível de zoom
         });
 
         // Marcador para a localização do usuário
         new mapboxgl.Marker()
             .setLngLat([lon, lat])
             .addTo(map);
+
+        // Adicionar marcadores de oficinas no mapa
+        fetch('/oficinas')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(oficina => {
+                    addOfficinaMarker(oficina.lat, oficina.lon, oficina.nome, map);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar oficinas:', error));
     }
 
     // Função para adicionar marcadores de oficinas no mapa
-    function addOfficinaMarker(lat, lon, nome) {
+    function addOfficinaMarker(lat, lon, nome, map) {
         new mapboxgl.Marker()
             .setLngLat([lon, lat])
             .setPopup(new mapboxgl.Popup().setHTML(`<h3>${nome}</h3>`)) // Exibe o nome da oficina no popup
             .addTo(map);
     }
+
+    // Alert Dismissal
+    document.querySelectorAll('.alert .close').forEach(button => {
+        button.addEventListener('click', () => {
+            button.closest('.alert').remove();
+        });
+    });
+
+    // Dropdown Toggle
+    document.querySelectorAll('.dropdown-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const dropdownMenu = button.nextElementSibling;
+            dropdownMenu.classList.toggle('show');
+        });
+    });
 });

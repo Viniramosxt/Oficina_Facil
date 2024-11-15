@@ -1,20 +1,449 @@
-<!-- visualizar_relatorio.html -->
 {% extends "base.html" %}
 {% block title %}Relatório - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h2 class="card-title mb-0">Relatório de {{ relatorio.servico }}</h2>
-        </div>
-        <div class="card-body">
-            <p><strong>Cliente:</strong> {{ relatorio.cliente.username }}</p>
-            <p><strong>Serviço:</strong> {{ relatorio.servico }}</p>
-            <p><strong>Descrição:</strong> {{ relatorio.descricao }}</p>
-            <p><strong>Data:</strong> {{ relatorio.data.strftime('%d/%m/%Y') }}</p>
-            <a href="{{ url_for('listar_relatorios') }}" class="btn btn-secondary">Voltar para os relatórios</a>
+<div class="report-wrapper">
+    <div class="report-container">
+        <div class="report-card">
+            <!-- Cabeçalho -->
+            <div class="report-header">
+                <div class="header-content">
+                    <div class="status-badge {{ relatorio.status if relatorio.status else 'concluido' }}">
+                        {{ relatorio.status|title if relatorio.status else 'Concluído' }}
+                    </div>
+                    <h2>
+                        <i class="fas fa-file-alt"></i>
+                        Relatório de Serviço
+                    </h2>
+                    <p class="report-date">
+                        <i class="fas fa-calendar"></i>
+                        {{ relatorio.data.strftime('%d/%m/%Y') }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Informações do Cliente -->
+            <div class="info-section">
+                <h3>
+                    <i class="fas fa-user"></i>
+                    Informações do Cliente
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Nome:</span>
+                        <span class="value">{{ relatorio.cliente.username }}</span>
+                    </div>
+                    {% if relatorio.cliente.placa %}
+                    <div class="info-item">
+                        <span class="label">Veículo:</span>
+                        <span class="value">{{ relatorio.cliente.marca }} {{ relatorio.cliente.modelo }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Placa:</span>
+                        <span class="value">{{ relatorio.cliente.placa }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Detalhes do Serviço -->
+            <div class="info-section">
+                <h3>
+                    <i class="fas fa-tools"></i>
+                    Detalhes do Serviço
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Tipo de Serviço:</span>
+                        <span class="value">{{ relatorio.servico }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="label">Descrição:</span>
+                        <div class="description-box">
+                            {{ relatorio.descricao }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="report-actions">
+                <a href="{{ url_for('listar_relatorios') }}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar para Lista
+                </a>
+                <div class="action-buttons">
+                    {% if is_oficina %}
+                    <a href="#" class="btn-edit">
+                        <i class="fas fa-edit"></i>
+                        Editar Relatório
+                    </a>
+                    <a href="#" class="btn-print" onclick="printReport()">
+                        <i class="fas fa-print"></i>
+                        Imprimir
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<div id="print-content" style="display: none;">
+    <style type="text/css" media="print">
+        /* Estilos específicos para impressão */
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #000;
+            background: #fff;
+        }
+
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .print-logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .print-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+        }
+
+        .label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* Esconde elementos desnecessários na impressão */
+        .report-actions, 
+        .btn-print,
+        .btn-edit {
+            display: none !important;
+        }
+    </style>
+
+    <div class="print-header">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="print-logo">
+        <h1 class="print-title">Relatório de Serviço</h1>
+        <p>Data: {{ relatorio.data.strftime('%d/%m/%Y') }}</p>
+    </div>
+
+    <div class="info-section">
+        <h2>Informações do Cliente</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Cliente:</span>
+                <span>{{ relatorio.cliente.username }}</span>
+            </div>
+            {% if relatorio.cliente.placa %}
+            <div class="info-item">
+                <span class="label">Veículo:</span>
+                <span>{{ relatorio.cliente.marca }} {{ relatorio.cliente.modelo }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Placa:</span>
+                <span>{{ relatorio.cliente.placa }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>Detalhes do Serviço</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Tipo de Serviço:</span>
+                <span>{{ relatorio.servico }}</span>
+            </div>
+            <div class="info-item full-width">
+                <span class="label">Descrição:</span>
+                <p>{{ relatorio.descricao }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>OFICINA FÁCIL - {{ relatorio.oficina.nome }}</p>
+        <p>{{ relatorio.oficina.endereco }}</p>
+        <p>Tel: {{ relatorio.oficina.telefone }}</p>
+    </div>
+</div>
+
+<script>
+function printReport() {
+    // Cria uma nova janela para impressão
+    const printWindow = window.open('', '_blank');
+    
+    // Obtém o conteúdo do relatório
+    const content = document.getElementById('print-content').innerHTML;
+    
+    // Escreve o conteúdo na nova janela
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Relatório de Serviço - OFICINA FÁCIL</title>
+                ${content}
+            </head>
+            <body>
+                <div class="print-container">
+                    ${content}
+                </div>
+                <script>
+                    // Abre o diálogo de impressão automaticamente
+                    window.onload = function() {
+                        window.print();
+                        // Fecha a janela após a impressão
+                        window.onfocus = function() { window.close(); }
+                    }
+                <\/script>
+            </body>
+        </html>
+    `);
+}
+</script>
+
+<style>
+.report-wrapper {
+    min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.report-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.report-card {
+    background: rgba(31, 42, 68, 0.95);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header Section */
+.report-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.report-date {
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.status-badge.pendente {
+    background: rgba(255, 193, 7, 0.2);
+    color: var(--accent-color);
+}
+
+.status-badge.em_andamento {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+}
+
+.status-badge.concluido {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+/* Info Sections */
+.info-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+}
+
+.info-section h3 {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-section h3 i {
+    color: var(--accent-color);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.label {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.value {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.description-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 10px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Actions */
+.report-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-secondary,
+.btn-edit,
+.btn-print {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+}
+
+.btn-edit {
+    background: var(--accent-color);
+    color: var(--primary-color);
+}
+
+.btn-print {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover,
+.btn-edit:hover,
+.btn-print:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .report-wrapper {
+        padding: 1rem;
+    }
+
+    .report-card {
+        padding: 1.5rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-actions {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-secondary,
+    .btn-edit,
+    .btn-print {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 {% endblock %}

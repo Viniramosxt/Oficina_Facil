@@ -2,6 +2,7 @@ from extensions import db
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import requests
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -48,13 +49,13 @@ class Plano(db.Model):
         return f'<Plano {self.nome}>'
 
 
-class Oficina(db.Model):
+class Oficina(db.Model, UserMixin):  # Adicione UserMixin aqui
     __tablename__ = 'oficina'
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    senha = db.Column(db.String(255), nullable=False)  # Aumentado para 255
+    senha = db.Column(db.String(512), nullable=False)  # Aumentado para 512
     cnpj = db.Column(db.String(18), unique=True, nullable=False)
     endereco = db.Column(db.String(255))
     telefone = db.Column(db.String(50))
@@ -64,7 +65,7 @@ class Oficina(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     atendimentos = db.Column(db.Integer, default=0)
     avaliacao = db.Column(db.Float, default=5.0)
-    especialidades = db.Column(db.Text)
+    especialidades = db.Column(db.String(255))  # Alterado para String(255)
     horario = db.Column(db.String(255))
     horario_fds = db.Column(db.String(255))
 
@@ -76,7 +77,8 @@ class Oficina(db.Model):
                  horario_fds=None, logo=None):
         self.nome = nome
         self.email = email
-        self.senha = senha  # Armazena a senha diretamente
+        # Hash da senha antes de armazenar
+        self.senha = generate_password_hash(senha)
         self.cnpj = cnpj
         self.endereco = endereco
         self.telefone = telefone
@@ -89,13 +91,39 @@ class Oficina(db.Model):
         self.atendimentos = 0
         self.avaliacao = 5.0
 
-    def check_password(self, password):
-        # Compara diretamente a senha armazenada com a fornecida
-        return self.senha == password
+    def check_password(self, senha):
+        # Alterado para usar o atributo 'senha' ao invés de 'senha_hash'
+        return check_password_hash(self.senha, senha)
+    
+    # Certifique-se de que estes métodos existam
+    def get_id(self):
+        return str(self.id)
+    
+    @property
+    def is_authenticated(self):
+        return True
+    
+    @property
+    def is_active(self):
+        return True
+        
+    @property
+    def is_anonymous(self):
+        return False
 
-    def __repr__(self):
-        return f'<Oficina {self.nome}>'
+    @staticmethod
+    def get_all_oficinas():
+        return Oficina.query.all()
 
+    def update_location(self):
+        if self.endereco:
+            response = requests.get(f'https://nominatim.openstreetmap.org/search?q={self.endereco}&format=json')
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    self.lat = float(data[0]['lat'])
+                    self.lon = float(data[0]['lon'])
+                    db.session.commit()
 
     def __repr__(self):
         return f'<Oficina {self.nome}>'
