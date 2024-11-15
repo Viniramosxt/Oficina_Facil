@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Agendamentos - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="agendamentos-wrapper">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-calendar-alt"></i>
+            Agendamentos
+        </h1>
+        <p class="subtitle">Visualize e gerencie todos os agendamentos da oficina</p>
+    </div>
+
+    <div class="filters-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Buscar agendamentos...">
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="todos">Todos</button>
+            <button class="filter-btn" data-filter="pendentes">Pendentes</button>
+            <button class="filter-btn" data-filter="em_andamento">Em Andamento</button>
+            <button class="filter-btn" data-filter="concluidos">Concluídos</button>
+        </div>
+    </div>
+
+    <div class="agendamentos-grid">
+        {% if agendamentos %}
+            {% for agendamento in agendamentos %}
+            <div class="agendamento-card" data-status="{{ agendamento.status }}">
+                <div class="card-header">
+                    <span class="data">{{ agendamento.data.strftime('%d/%m/%Y') }}</span>
+                    <span class="status-badge {{ agendamento.status }}">
+                        {{ agendamento.status|title }}
+                    </span>
+                </div>
+                
+                <div class="card-body">
+                    <h3>{{ agendamento.servico }}</h3>
+                    <p>{{ agendamento.descricao }}</p>
+                    
+                    <div class="cliente-info">
+                        <i class="fas fa-user"></i>
+                        <span>{{ agendamento.cliente.username }}</span>
+                    </div>
+                    
+                    <div class="veiculo-info">
+                        <i class="fas fa-car"></i>
+                        <span>{{ agendamento.cliente.marca }} {{ agendamento.cliente.modelo }}</span>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <a href="{{ url_for('visualizar_relatorio', id=agendamento.id) }}" 
+                       class="btn-details">
+                        <i class="fas fa-eye"></i>
+                        Ver Detalhes
+                    </a>
+                    
+                    <a href="{{ url_for('criar_relatorio', agendamento_id=agendamento.id) }}" 
+                       class="btn-report">
+                        <i class="fas fa-file-alt"></i>
+                        Criar Relatório
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>Nenhum agendamento encontrado</h3>
+                <p>Não há agendamentos registrados no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Seus estilos CSS aqui - use as variáveis que já definimos anteriormente */
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros de status
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const agendamentoCards = document.querySelectorAll('.agendamento-card');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            agendamentoCards.forEach(card => {
+                if (filter === 'todos' || card.dataset.status === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Busca
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        agendamentoCards.forEach(card => {
+            const content = card.textContent.toLowerCase();
+            if (content.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    /* Wrapper principal */
+    .agendamentos-wrapper {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: calc(100vh - 64px); /* Altura do header */
+    }
+    
+    /* Cabeçalho da página */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .page-header i {
+        color: var(--accent-color);
+    }
+    
+    .subtitle {
+        color: var(--gray);
+        font-size: 1.1rem;
+    }
+    
+    /* Seção de filtros */
+    .filters-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent-color);
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: var(--text-color);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 0.8rem 1.2rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 8px;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filter-btn.active {
+        background: var(--accent-color);
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .filter-btn:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Grid de agendamentos */
+    .agendamentos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .agendamento-card {
+        background: var(--primary-color);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .agendamento-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-header {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .data {
+        font-size: 0.9rem;
+        color: var(--accent-color);
+        font-weight: 500;
+    }
+    
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .status-badge.pendente {
+        background: rgba(255, 193, 7, 0.2);
+        color: var(--accent-color);
+    }
+    
+    .status-badge.em_andamento {
+        background: rgba(0, 123, 255, 0.2);
+        color: #007bff;
+    }
+    
+    .status-badge.concluido {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .card-body h3 {
+        color: var(--text-color);
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .card-body p {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .cliente-info, .veiculo-info {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+        color: var(--gray);
+    }
+    
+    .cliente-info i, .veiculo-info i {
+        color: var(--accent-color);
+    }
+    
+    .card-footer {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-details, .btn-report {
+        flex: 1;
+        padding: 0.8rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .btn-details {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+    }
+    
+    .btn-report {
+        background: var(--accent-color);
+        color: var(--primary-color);
+    }
+    
+    .btn-details:hover, .btn-report:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Estado vazio */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--primary-color);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--accent-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        color: var(--text-color);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--gray);
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .agendamentos-wrapper {
+            padding: 1rem;
+        }
+    
+        .filters-section {
+            flex-direction: column;
+        }
+    
+        .filter-buttons {
+            width: 100%;
+            justify-content: center;
+        }
+    
+        .card-footer {
+            flex-direction: column;
+        }
+    
+        .page-header h1 {
+            font-size: 2rem;
+        }
+    }
+    
+    /* Loading State */
+    .loading-skeleton {
+        background: linear-gradient(90deg, 
+            rgba(255, 255, 255, 0.05) 25%, 
+            rgba(255, 255, 255, 0.1) 50%, 
+            rgba(255, 255, 255, 0.05) 75%
+        );
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
+    }
+    </style>
+{% endblock %}

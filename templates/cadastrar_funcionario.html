@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Funcionário - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>Cadastrar Funcionário</h2>
+                <p class="auth-subtitle">Adicione um novo membro à sua equipe</p>
+            </div>
+            
+            <form action="{{ url_for('cadastrar_funcionario') }}" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="nome">
+                        <i class="fas fa-user"></i>
+                        Nome Completo
+                    </label>
+                    <input type="text" name="nome" id="nome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" name="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senha">
+                        <i class="fas fa-lock"></i>
+                        Senha
+                    </label>
+                    <input type="password" name="senha" id="senha" required>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-plus-circle"></i>
+                    Cadastrar Funcionário
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 2rem;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-card {
+    background: var(--primary-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    color: var(--text-color);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-icon i {
+    font-size: 2.5rem;
+    color: var(--text-color);
+}
+
+.auth-header h2 {
+    color: var(--text-color);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    color: var(--gray);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.auth-form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background: var(--hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 480px) {
+    .auth-wrapper {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}

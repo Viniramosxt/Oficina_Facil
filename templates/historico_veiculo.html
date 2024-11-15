@@ -2,114 +2,159 @@
 {% block title %}Histórico do Veículo - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="historico-container">
-    <div class="page-header">
-        <h1>Histórico de Manutenção</h1>
-        <p class="subtitle">Acompanhe todas as manutenções realizadas no seu veículo</p>
-    </div>
-
-    <!-- Seção de Filtros e Pesquisa -->
-    <div class="filters-section">
-        <div class="search-box">
-            <input type="text" placeholder="Buscar serviços..." class="search-input">
-            <i class="fas fa-search"></i>
+<div class="history-wrapper">
+    <div class="history-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>
+                    <i class="fas fa-history"></i>
+                    Histórico de Manutenção
+                </h1>
+                <p class="header-subtitle">Acompanhe todas as manutenções realizadas no seu veículo</p>
+            </div>
+            <a href="{{ url_for('agendar_manutencao') }}" class="btn-schedule">
+                <i class="fas fa-plus"></i>
+                Nova Manutenção
+            </a>
         </div>
-        <div class="filter-buttons">
-            <button class="filter-btn active" data-status="todos">Todos</button>
-            <button class="filter-btn" data-status="em_andamento">Em andamento</button>
-            <button class="filter-btn" data-status="concluidos">Concluídos</button>
-        </div>
-    </div>
 
-    <!-- Exibição dos Relatórios -->
-    <div class="timeline-container">
-        {% if relatorios %}
-            {% for relatorio in relatorios %}
-                <div class="timeline-item">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar serviços...">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="todos">
+                    <i class="fas fa-list"></i>
+                    Todos
+                </button>
+                <button class="filter-btn" data-filter="em_andamento">
+                    <i class="fas fa-clock"></i>
+                    Em andamento
+                </button>
+                <button class="filter-btn" data-filter="concluidos">
+                    <i class="fas fa-check-circle"></i>
+                    Concluídos
+                </button>
+            </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="timeline-container">
+            {% if relatorios %}
+                {% for relatorio in relatorios %}
+                <div class="timeline-item" data-status="{{ relatorio.status }}">
                     <div class="timeline-date">
-                        <span class="date">{{ relatorio.data.strftime('%d') }}</span>
-                        <span class="month">{{ relatorio.data.strftime('%b') }}</span>
-                        <span class="year">{{ relatorio.data.strftime('%Y') }}</span>
+                        <div class="date-box">
+                            <span class="day">{{ relatorio.data.strftime('%d') }}</span>
+                            <span class="month">{{ relatorio.data.strftime('%b') }}</span>
+                            <span class="year">{{ relatorio.data.strftime('%Y') }}</span>
+                        </div>
+                        <div class="status-line"></div>
                     </div>
-                    <div class="timeline-content">
-                        <div class="service-card">
-                            <div class="service-header">
-                                <h3>{{ relatorio.servico }}</h3>
-                                <span class="oficina-badge">{{ relatorio.oficina.nome }}</span>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-info">
+                                <h3>
+                                    <i class="fas fa-tools"></i>
+                                    {{ relatorio.servico }}
+                                </h3>
+                                <span class="status-badge {{ relatorio.status }}">
+                                    {{ relatorio.status|title }}
+                                </span>
                             </div>
-                            <div class="service-body">
-                                <p>{{ relatorio.descricao }}</p>
+                            <div class="oficina-badge">
+                                <i class="fas fa-warehouse"></i>
+                                {{ relatorio.oficina.nome }}
                             </div>
-                            <div class="service-footer">
-                                <button class="details-btn">
-                                    <i class="fas fa-eye"></i> Ver Detalhes
-                                </button>
+                        </div>
+
+                        <div class="service-body">
+                            <p>{{ relatorio.descricao }}</p>
+                            
+                            {% if relatorio.status == 'em_andamento' %}
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 60%"></div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="service-footer">
+                            <div class="service-details">
+                                <span class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    Duração estimada: 2h
+                                </span>
+                                {% if relatorio.valor %}
+                                <span class="detail-item">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    Valor: R$ {{ relatorio.valor }}
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <i class="fas fa-history empty-icon"></i>
-                <h3>Nenhum histórico encontrado</h3>
-                <p>Você ainda não possui registros de manutenção cadastrados.</p>
-                <a href="{{ url_for('servicos') }}" class="btn-add-registro">
-                    <i class="fas fa-plus"></i> Agendar Manutenção
-                </a>
-            </div>
-        {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Nenhum histórico encontrado</h3>
+                    <p>Você ainda não possui registros de manutenção cadastrados.</p>
+                    <a href="{{ url_for('agendar_manutencao') }}" class="btn-schedule">
+                        <i class="fas fa-plus"></i>
+                        Agendar Primeira Manutenção
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
-<script>
-    document.querySelectorAll('.filter-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            let status = this.getAttribute('data-status');
-            let timelineItems = document.querySelectorAll('.timeline-item');
-
-            // Remover a classe active do botão
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-
-            // Filtrar os itens da linha do tempo
-            timelineItems.forEach(item => {
-                let relatorioStatus = item.getAttribute('data-status');
-                if (status === 'todos' || relatorioStatus === status) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
 
 <style>
-.historico-container {
+.history-wrapper {
+    min-height: 100vh;
     padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.history-container {
     max-width: 1000px;
-    margin: 80px auto 0; /* Ajustado para considerar a navbar fixa */
-    background: var(--primary-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    margin: 0 auto;
 }
 
+/* Header Styles */
 .page-header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
 }
 
-.page-header h1 {
-    font-size: 2rem;
+.header-content h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     color: var(--text-color);
+    font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
-.subtitle {
-    color: var(--text-color);
-    opacity: 0.8;
+.header-subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
 }
 
+/* Filters Section */
 .filters-section {
     display: flex;
     justify-content: space-between;
@@ -120,18 +165,9 @@
 }
 
 .search-box {
-    position: relative;
     flex: 1;
-    max-width: 400px;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.8rem 1rem 0.8rem 2.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-color);
+    position: relative;
+    min-width: 250px;
 }
 
 .search-box i {
@@ -139,8 +175,16 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
+    color: var(--gray);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
     color: var(--text-color);
-    opacity: 0.6;
 }
 
 .filter-buttons {
@@ -149,10 +193,13 @@
 }
 
 .filter-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 10px;
     color: var(--text-color);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -160,105 +207,185 @@
 
 .filter-btn.active {
     background: var(--secondary-color);
-    border-color: var(--secondary-color);
 }
 
+/* Timeline Styles */
 .timeline-container {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .timeline-item {
     display: flex;
-    margin-bottom: 2rem;
+    gap: 2rem;
 }
 
 .timeline-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-width: 100px;
-    text-align: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    margin-right: 1rem;
 }
 
-.date {
+.date-box {
+    background: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.day {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--text-color);
+    display: block;
 }
 
 .month, .year {
-    display: block;
-    color: var(--text-color);
-    opacity: 0.7;
     font-size: 0.9rem;
+    display: block;
 }
 
-.service-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 1.5rem;
+.status-line {
     flex: 1;
+    width: 2px;
+    background: var(--secondary-color);
+    margin: 0.5rem 0;
+}
+
+/* Service Card Styles */
+.service-card {
+    flex: 1;
+    background: var(--primary-color);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
 }
 
 .service-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
 }
 
-.service-header h3 {
+.service-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.service-info h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     color: var(--text-color);
     font-size: 1.2rem;
 }
 
-.oficina-badge {
-    background: var(--secondary-color);
+.status-badge {
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-size: 0.9rem;
-    color: var(--text-color);
 }
 
-.service-body p {
-    color: var(--text-color);
-    opacity: 0.8;
-    line-height: 1.6;
+.status-badge.em_andamento {
+    background: #ffd700;
+    color: #000;
 }
 
-.service-footer {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: flex-end;
+.status-badge.concluido {
+    background: #00c853;
+    color: #fff;
 }
 
-.details-btn {
-    background: none;
-    border: 1px solid var(--secondary-color);
-    color: var(--text-color);
+.oficina-badge {
+    background: rgba(255, 255, 255, 0.1);
     padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--text-color);
 }
 
-.details-btn:hover {
+.service-body {
+    margin: 1rem 0;
+    color: var(--gray);
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.service-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.service-details {
+    display: flex;
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn-schedule, .btn-details {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
     background: var(--secondary-color);
+    border: none;
+    border-radius: 10px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
+.btn-details {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-schedule:hover, .btn-details:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 4rem 2rem;
+    padding: 3rem;
+    background: var(--primary-color);
+    border-radius: 15px;
 }
 
 .empty-icon {
-    font-size: 3rem;
-    color: var(--text-color);
-    opacity: 0.3;
+    font-size: 4rem;
+    color: var(--gray);
     margin-bottom: 1rem;
 }
 
@@ -268,49 +395,97 @@
 }
 
 .empty-state p {
-    color: var(--text-color);
-    opacity: 0.7;
+    color: var(--gray);
     margin-bottom: 1.5rem;
 }
 
-.btn-add-registro {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.5rem;
-    background: var(--secondary-color);
-    color: var(--text-color);
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.btn-add-registro:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
 @media (max-width: 768px) {
-    .historico-container {
+    .history-wrapper {
         padding: 1rem;
     }
-    
-    .timeline-item {
+
+    .page-header {
         flex-direction: column;
+        gap: 1rem;
+        text-align: center;
     }
-    
-    .timeline-date {
-        margin-bottom: 1rem;
-        margin-right: 0;
-    }
-    
+
     .filters-section {
         flex-direction: column;
     }
-    
-    .search-box {
-        max-width: none;
+
+    .timeline-item {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .timeline-date {
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .status-line {
+        display: none;
+    }
+
+    .service-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .service-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .service-details {
+        flex-direction: column;
     }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtro de status
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const timelineItems = document.querySelectorAll('.timeline-item');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            timelineItems.forEach(item => {
+                if (filter === 'todos' || item.dataset.status === filter) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Busca
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        timelineItems.forEach(item => {
+            const serviceName = item.querySelector('.service-info h3').textContent.toLowerCase();
+            const description = item.querySelector('.service-body').textContent.toLowerCase();
+            
+            if (serviceName.includes(searchTerm) || description.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

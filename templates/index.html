@@ -3,75 +3,367 @@
 {% block title %}Home - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo OFICINA FÁCIL" class="logo center-logo">
-    <h1>Bem-vindo ao Oficina Fácil</h1>
-</section>
-
-<section id="sobre" class="section">
-    <h2>Sobre Nós</h2>
-    <p>Bem-vindo ao Oficina Fácil! Somos uma plataforma inovadora criada para transformar a experiência de manutenção veicular...</p>
-</section>
-
-<section id="servicos" class="section">
-    <h2>Serviços</h2>
-    <div class="services-grid">
-        <div class="service-card" id="card1">
-            <h3>Manutenção Preventiva</h3>
-            <p>Mantenha seu veículo sempre em dia</p>
-            <a href="{{ url_for('servicos') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
+<div class="main-wrapper">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo OFICINA FÁCIL" class="hero-logo">
+            <h1 class="hero-title">Bem-vindo ao Oficina Fácil</h1>
+            <p class="hero-subtitle">Sua solução completa para manutenção veicular</p>
+            {% if not current_user.is_authenticated %}
+            <div class="hero-buttons">
+                <a href="{{ url_for('login') }}" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Começar Agora
+                </a>
+                <a href="#servicos" class="btn-secondary">
+                    <i class="fas fa-info-circle"></i>
+                    Saiba Mais
+                </a>
+            </div>
+            {% endif %}
         </div>
-        <div class="service-card" id="card2">
-            <h3>Reparos de Emergência</h3>
-            <p>Assistência quando você mais precisa</p>
-            <a href="{{ url_for('reparos_emergencia') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
-        </div>
-        <div class="service-card" id="card3">
-            <h3>Histórico do Veículo</h3>
-            <p>Acompanhe todas as manutenções</p>
-            <a href="{{ url_for('historico_veiculo') }}" class="animated-button10"><span></span><span></span><span></span><span></span>Saiba Mais</a>
-        </div>
-    </div>
-    {% if current_user.is_authenticated %}
-        <a href="{{ url_for('servicos') }}" class="btn-primary">Ver Todos os Planos</a>
-    {% else %}
-        <p>Faça login para ver os planos disponíveis.</p>
-        <a href="{{ url_for('login') }}" class="btn-primary">Login</a>
-    {% endif %}
-</section>
+    </section>
 
-<section class="hero">
-    <p>Permita que o Google use sua localização para apresentar o melhor plano para você.</p>
-    <button id="locationButton" class="btn-primary">Usar minha localização</button>
-</section>
+    <!-- Sobre Section -->
+    <section id="sobre" class="section about-section">
+        <div class="section-header">
+            <h2>Sobre Nós</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Bem-vindo ao Oficina Fácil! Somos uma plataforma inovadora criada para transformar a experiência de manutenção veicular, oferecendo praticidade, segurança e tranquilidade para você e seu veículo.</p>
+            </div>
+        </div>
+    </section>
 
-<!-- Seção do Mapa -->
-<section id="map-container" class="section">
-    <h2>Oficinas Próximas</h2>
-    <div id="map" style="width: 100%; height: 400px;"></div>
-</section>
+    <!-- Serviços Section -->
+    <section id="servicos" class="section services-section">
+        <div class="section-header">
+            <h2>Nossos Serviços</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="services-grid">
+            <div class="service-card" id="card1">
+                <div class="card-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3>Manutenção Preventiva</h3>
+                <p>Mantenha seu veículo sempre em dia com nossos planos de manutenção preventiva</p>
+                <a href="{{ url_for('servicos') }}" class="card-button">
+                    <span></span><span></span><span></span><span></span>
+                    Saiba Mais
+                </a>
+            </div>
+
+            <div class="service-card" id="card2">
+                <div class="card-icon">
+                    <i class="fas fa-ambulance"></i>
+                </div>
+                <h3>Reparos de Emergência</h3>
+                <p>Assistência rápida e eficiente quando você mais precisa</p>
+                <a href="{{ url_for('reparos_emergencia') }}" class="card-button">
+                    <span></span><span></span><span></span><span></span>
+                    Saiba Mais
+                </a>
+            </div>
+
+            <div class="service-card" id="card3">
+                <div class="card-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Histórico do Veículo</h3>
+                <p>Acompanhe todo o histórico de manutenções do seu veículo</p>
+                <a href="{{ url_for('historico_veiculo') }}" class="card-button">
+                    <span></span><span></span><span></span><span></span>
+                    Saiba Mais
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="section location-section">
+        <div class="location-content">
+            <h2>Encontre Oficinas Próximas</h2>
+            <p>Permita que utilizemos sua localização para mostrar as melhores oficinas da sua região</p>
+            <button id="locationButton" class="btn-location">
+                <i class="fas fa-map-marker-alt"></i>
+                Usar minha localização
+            </button>
+        </div>
+        <div id="map" class="map-container"></div>
+    </section>
+</div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
 <script src="{{ url_for('static', filename='js/localizacao.js') }}"></script>
 
+<style>
+/* Main Wrapper */
+.main-wrapper {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/static/images/car-bg.jpg') center/cover;
+    opacity: 0.1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.hero-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin-bottom: 2rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Section Styles */
+.section {
+    padding: 5rem 2rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.section-divider {
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+/* Services Grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.service-card {
+    background: var(--primary-color);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+    transform: translateY(100%);
+    transition: transform 0.6s ease;
+}
+
+.service-card:hover::before {
+    transform: translateY(0);
+}
+
+.card-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon i {
+    font-size: 2rem;
+    color: var(--text-color);
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.service-card p {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+}
+
+.card-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Location Section */
+.location-section {
+    background: var(--primary-color);
+    padding: 4rem 2rem;
+}
+
+.location-content {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.btn-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-location:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.map-container {
+    height: 400px;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .section {
+        padding: 3rem 1rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+}
+
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const cards = document.querySelectorAll('.service-card');  // Seleciona todos os cards
+    // Smooth scroll para links internos
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Animação dos cards
+    const cards = document.querySelectorAll('.service-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.transform = 'translateY(0)';
+                entry.target.style.opacity = '1';
+            }
+        });
+    });
 
     cards.forEach(card => {
-        // Quando o mouse entra no card, adiciona a classe de animação
-        card.addEventListener('mouseenter', function() {
-            card.classList.add('zoomed');
-        });
-
-        // Quando o mouse sai do card, remove a classe de animação
-        card.addEventListener('mouseleave', function() {
-            card.classList.remove('zoomed');
-        });
+        card.style.transform = 'translateY(50px)';
+        card.style.opacity = '0';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
     });
 });
 </script>
 
 {% endblock %}
-

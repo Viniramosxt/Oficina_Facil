@@ -10,6 +10,12 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+     
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,150 +27,169 @@
 </head>
 <body>
     <!-- Barra de Progresso -->
-    <div class="progress-bar" id="progressBar"></div>
+    <div id="progressBar" class="progress-bar"></div>
 
-    <!-- Header com Navbar -->
+    <!-- Header Principal -->
     <header class="main-header">
-        <!-- Navbar Atualizada -->
-<!-- Navbar Atualizada -->
-<!-- Navbar Atualizada -->
-<nav class="navbar">
-    <div class="container">
-        <!-- Logo e marca -->
-        <div class="brand">
-            <a href="{{ url_for('home') }}" class="logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Oficina Fácil" class="logo-img">
-                <span>OFICINA FÁCIL</span>
-            </a>
-        </div>
-
-        <!-- Menu principal e autenticação -->
-        <div class="nav-wrapper">
-            <!-- Links principais -->
-            <div class="nav-links">
-                <!-- Links de navegação -->
-                <a href="{{ url_for('home') }}" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
+        <div class="container">
+            <!-- Logo e Marca -->
+            <div class="brand">
+                <a href="{{ url_for('home') }}" class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Oficina Fácil" class="logo-img">
+                    OFICINA FÁCIL
                 </a>
-                <a href="{{ url_for('servicos') }}" class="nav-link">
-                    <i class="fas fa-tools"></i>
-                    <span>Serviços</span>
-                </a>
-
-                <!-- Verifica se é cliente ou oficina -->
-                {% if current_user.is_authenticated %}
-                    {% if current_user.is_oficina %}
-                        <!-- Área de navegação para Oficina -->
-                        <div class="user-dropdown">
-                            <button class="user-menu-btn">
-                                <i class="fas fa-wrench"></i>
-                                <span>{{ current_user.username }}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a href="{{ url_for('perfil_oficina') }}" class="dropdown-item">
-                                    <i class="fas fa-cogs"></i>
-                                    Meu Perfil
-                                </a>
-                                <a href="{{ url_for('historico_veiculo') }}" class="dropdown-item">
-                                    <i class="fas fa-history"></i>
-                                    Histórico
-                                </a>
-                                <a href="{{ url_for('servicos') }}" class="dropdown-item">
-                                    <i class="fas fa-car"></i>
-                                    Manutenção
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ url_for('logout') }}" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    Sair
-                                </a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <!-- Área de navegação para Cliente -->
-                        <div class="user-dropdown">
-                            <button class="user-menu-btn">
-                                {% if current_user.foto_perfil %}
-                                    <img src="{{ url_for('static', filename='uploads/' + current_user.foto_perfil) }}" alt="Perfil" class="user-avatar">
-                                {% else %}
-                                    <i class="fas fa-user-circle"></i>
-                                {% endif %}
-                                <span>{{ current_user.username }}</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a href="{{ url_for('perfil') }}" class="dropdown-item">
-                                    <i class="fas fa-user"></i>
-                                    Meu Perfil
-                                </a>
-                                <a href="{{ url_for('historico_veiculo') }}" class="dropdown-item">
-                                    <i class="fas fa-history"></i>
-                                    Histórico
-                                </a>
-                                <a href="{{ url_for('servicos') }}" class="dropdown-item">
-                                    <i class="fas fa-car"></i>
-                                    Manutenção
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ url_for('logout') }}" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    Sair
-                                </a>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="auth-buttons">
-                        <div class="dropdown">
-                            <button class="auth-btn">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>Entrar</span>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a href="{{ url_for('login') }}" class="dropdown-item">
-                                    <i class="fas fa-user"></i>
-                                    Login Cliente
-                                </a>
-                                <a href="{{ url_for('login_oficina') }}" class="dropdown-item">
-                                    <i class="fas fa-wrench"></i>
-                                    Login Oficina
-                                </a>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('register') }}" class="auth-btn register-btn">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Cadastre-se</span>
-                        </a>
-                    </div>
-                {% endif %}
             </div>
 
-            <!-- Menu mobile -->
-            <button class="menu-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <!-- Navegação -->
+            <div class="nav-wrapper">
+                <nav class="nav-links">
+                    <a href="{{ url_for('home') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                    <a href="{{ url_for('servicos') }}" class="nav-link">
+                        <i class="fas fa-tools"></i>
+                        Serviços
+                    </a>
+
+                    {% if current_user.is_authenticated %}
+                        {% if session.get('oficina_id') %}
+                            <!-- Menu para Oficinas -->
+                            <div class="user-dropdown">
+                                <div class="profile-info">
+                                    {% if oficina.logo %}
+                                        <img src="{{ url_for('static', filename='uploads/' + oficina.logo) }}" class="user-avatar">
+                                    {% else %}
+                                        <i class="fas fa-warehouse"></i>
+                                    {% endif %}
+                                    <span>{{ oficina.nome }}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+
+                                <div class="dropdown-menu">
+                                    <a href="{{ url_for('perfil_oficina') }}" class="dropdown-item">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                        Dashboard
+                                    </a>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <!-- Seção Funcionários -->
+                                    <a href="{{ url_for('cadastrar_funcionario') }}" class="dropdown-item">
+                                        <i class="fas fa-user-plus"></i>
+                                        Cadastrar Funcionário
+                                    </a>
+                                    <a href="{{ url_for('listar_funcionarios') }}" class="dropdown-item">
+                                        <i class="fas fa-users"></i>
+                                        Lista de Funcionários
+                                    </a>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <!-- Seção Relatórios -->
+                                    <a href="{{ url_for('criar_relatorio') }}" class="dropdown-item">
+                                        <i class="fas fa-file-alt"></i>
+                                        Criar Relatório
+                                    </a>
+                                    <a href="{{ url_for('listar_relatorios') }}" class="dropdown-item">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        Listar Relatórios
+                                    </a>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <!-- Seção Agendamentos -->
+                                    <a href="{{ url_for('visualizar_agendamentos') }}" class="dropdown-item">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Agendamentos
+                                    </a>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <a href="{{ url_for('editar_perfil_oficina') }}" class="dropdown-item">
+                                        <i class="fas fa-cog"></i>
+                                        Editar Perfil
+                                    </a>
+                                    <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        Sair
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Menu para Clientes -->
+                            <div class="user-dropdown">
+                                <div class="profile-info">
+                                    {% if current_user.foto_perfil %}
+                                        <img src="{{ url_for('static', filename='uploads/' + current_user.foto_perfil) }}" class="user-avatar">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                    <span>{{ current_user.username }}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+
+                                <div class="dropdown-menu">
+                                    <a href="{{ url_for('perfil') }}" class="dropdown-item">
+                                        <i class="fas fa-user"></i>
+                                        Meu Perfil
+                                    </a>
+                                    <a href="{{ url_for('historico_veiculo') }}" class="dropdown-item">
+                                        <i class="fas fa-history"></i>
+                                        Histórico
+                                    </a>
+                                    <a href="{{ url_for('agendar_manutencao') }}" class="dropdown-item">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        Agendar Manutenção
+                                    </a>
+                                    
+                                    <div class="dropdown-divider"></div>
+                                    
+                                    <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        Sair
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <!-- Menu para Visitantes -->
+                        <div class="auth-buttons">
+                            <div class="dropdown">
+                                <button class="dropdown-toggle">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Entrar
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a href="{{ url_for('login') }}" class="dropdown-item">
+                                        <i class="fas fa-user"></i>
+                                        Login Cliente
+                                    </a>
+                                    <a href="{{ url_for('login_oficina') }}" class="dropdown-item">
+                                        <i class="fas fa-warehouse"></i>
+                                        Login Oficina
+                                    </a>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('register') }}" class="auth-btn register-btn">
+                                <i class="fas fa-user-plus"></i>
+                                Cadastre-se
+                            </a>
+                        </div>
+                    {% endif %}
+                </nav>
+            </div>
         </div>
-    </div>
-</nav>
-
-
     </header>
 
-    <!-- Flash Messages -->
+    <!-- Mensagens Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="flash-messages">
                 {% for category, message in messages %}
                     <div class="alert alert-{{ category }} alert-dismissible">
-                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
                         {{ message }}
-                        <button type="button" class="close-alert">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
                     </div>
                 {% endfor %}
             </div>
@@ -172,18 +197,19 @@
     {% endwith %}
 
     <!-- Conteúdo Principal -->
-    <main class="main-content">
+    <main class="main-content" role="main">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="main-footer">
+    <footer>
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-section">
                     <h3>Sobre Nós</h3>
                     <p>OFICINA FÁCIL - Sua plataforma completa para gestão e manutenção veicular.</p>
                 </div>
+                
                 <div class="footer-section">
                     <h3>Links Úteis</h3>
                     <ul>
@@ -193,35 +219,38 @@
                         <li><a href="#">Contato</a></li>
                     </ul>
                 </div>
+                
                 <div class="footer-section">
                     <h3>Contato</h3>
-                    <ul class="contact-info">
+                    <ul>
                         <li><i class="fas fa-phone"></i> (11) 99999-9999</li>
                         <li><i class="fas fa-envelope"></i> contato@oficinafacil.com</li>
                         <li><i class="fas fa-map-marker-alt"></i> São Paulo, SP</li>
                     </ul>
                 </div>
+                
                 <div class="footer-section">
                     <h3>Redes Sociais</h3>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
+            
             <div class="footer-bottom">
-                <p>© 2024 OFICINA FÁCIL. Todos os direitos reservados.</p>
+                <p>&copy; 2024 OFICINA FÁCIL. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Loading Overlay -->
+    <!-- Overlay de Carregamento -->
     <div class="loading-overlay">
         <div class="loader"></div>
     </div>
-
+    
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     {% block extra_js %}{% endblock %}
@@ -286,3 +315,432 @@
 </body>
 </html>
 
+<style>/* Variáveis e Configurações Globais */
+    :root {
+        --primary-color: #1F2A44;
+        --secondary-color: #007BFF;
+        --accent-color: #FFC107;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --text-color: #FFFFFF;
+        --text-muted: #6c757d;
+        --background-color: #2C3E50;
+        --surface-color: #1a2234;
+        --border-color: rgba(255, 255, 255, 0.1);
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        --transition: all 0.3s ease;
+    }
+    
+    /* Reset e Estilos Base */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Barra de Progresso */
+    .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+        z-index: 1100;
+        transform-origin: 0%;
+    }
+    
+    /* Header Principal */
+    .main-header {
+        background: var(--primary-color);
+        box-shadow: var(--shadow);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+    }
+    
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    /* Logo e Marca */
+    .brand {
+        display: flex;
+        align-items: center;
+    }
+    
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .logo-img {
+        height: 40px;
+        width: auto;
+    }
+    
+    /* Navegação */
+    .nav-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .nav-link {
+        color: var(--text-color);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+    
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    /* Dropdown do Usuário */
+    .user-dropdown {
+        position: relative;
+    }
+    
+    .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+    
+    .profile-info:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-color);
+    }
+    
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 220px;
+        background: var(--surface-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-top: 0.5rem;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: var(--transition);
+    }
+    
+    .user-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem 1.2rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .dropdown-item i {
+        width: 20px;
+        text-align: center;
+        color: var(--accent-color);
+    }
+    
+    .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dropdown-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 0.5rem 0;
+    }
+    
+    /* Botões de Autenticação */
+    .auth-buttons {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .dropdown-toggle {
+        background: transparent;
+        border: 1px solid var(--accent-color);
+        color: var(--text-color);
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+    
+    .dropdown-toggle:hover {
+        background: var(--accent-color);
+        color: var(--primary-color);
+    }
+    
+    .register-btn {
+        background: var(--accent-color);
+        color: var(--primary-color);
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+    
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+    
+    /* Mensagens Flash */
+    .flash-messages {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+    }
+    
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: slideIn 0.3s ease;
+    }
+    
+    .alert-success {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .alert-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    .alert-dismissible .close {
+        background: none;
+        border: none;
+        color: currentColor;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0 0.5rem;
+    }
+    
+    /* Conteúdo Principal */
+    .main-content {
+        flex: 1;
+        margin-top: 80px;
+        padding: 2rem 0;
+    }
+    
+    /* Footer */
+    footer {
+        background: var(--primary-color);
+        padding: 4rem 0 0;
+        margin-top: 4rem;
+    }
+    
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .footer-section h3 {
+        color: var(--accent-color);
+        margin-bottom: 1.2rem;
+        font-size: 1.2rem;
+    }
+    
+    .footer-section ul {
+        list-style: none;
+    }
+    
+    .footer-section ul li {
+        margin-bottom: 0.8rem;
+    }
+    
+    .footer-section a {
+        color: var(--text-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .footer-section a:hover {
+        color: var(--accent-color);
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .social-links a {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+    
+    .social-links a:hover {
+        background: var(--accent-color);
+        transform: translateY(-3px);
+    }
+    
+    .footer-bottom {
+        text-align: center;
+        padding: 1.5rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    /* Overlay de Carregamento */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+    
+    .loader {
+        width: 50px;
+        height: 50px;
+        border: 3px solid var(--accent-color);
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+    
+    /* Animações */
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .nav-wrapper {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    
+        .nav-links {
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    
+        .user-dropdown {
+            width: 100%;
+        }
+    
+        .dropdown-menu {
+            width: 100%;
+            position: static;
+            background: transparent;
+            box-shadow: none;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            margin-top: 0.5rem;
+        }
+    
+        .auth-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+    
+        .register-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    
+        .footer-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+    
+        .social-links {
+            justify-content: center;
+        }
+    }</style>

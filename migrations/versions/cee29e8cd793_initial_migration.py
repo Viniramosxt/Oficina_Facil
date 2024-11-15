@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 116feb535366
+Revision ID: cee29e8cd793
 Revises: 
-Create Date: 2024-11-12 21:24:36.361808
+Create Date: 2024-11-14 23:30:30.087800
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '116feb535366'
+revision = 'cee29e8cd793'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,13 +22,14 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
     sa.Column('preco', sa.Float(), nullable=False),
+    sa.Column('features', sa.String(length=255), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=150), nullable=False),
     sa.Column('email', sa.String(length=150), nullable=False),
-    sa.Column('password', sa.String(length=150), nullable=False),
+    sa.Column('password', sa.String(length=255), nullable=False),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.Column('marca', sa.String(length=50), nullable=True),
     sa.Column('modelo', sa.String(length=50), nullable=True),
@@ -48,8 +49,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('senha', sa.Text(), nullable=False),
-    sa.Column('cnpj', sa.String(length=14), nullable=False),
+    sa.Column('senha', sa.String(length=150), nullable=False),
+    sa.Column('cnpj', sa.String(length=18), nullable=False),
     sa.Column('endereco', sa.String(length=255), nullable=True),
     sa.Column('telefone', sa.String(length=50), nullable=True),
     sa.Column('logo', sa.String(length=255), nullable=True),
@@ -68,13 +69,12 @@ def upgrade():
     )
     op.create_table('funcionario',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('nome', sa.String(length=100), nullable=False),
-    sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('senha', sa.String(length=150), nullable=False),
-    sa.Column('id_oficina', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=150), nullable=True),
+    sa.Column('email', sa.String(length=150), nullable=True),
+    sa.Column('senha', sa.String(length=255), nullable=True),
+    sa.Column('id_oficina', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['id_oficina'], ['oficina.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('relatorio',
     sa.Column('id', sa.Integer(), nullable=False),

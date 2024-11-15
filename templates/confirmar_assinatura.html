@@ -3,26 +3,245 @@
 {% block title %}Confirmar Assinatura - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Confirmar Assinatura</h2>
-            <p>Você está prestes a assinar o seguinte plano:</p>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ plano.nome }}</h5>
-                    <p class="card-text">Preço: R$ {{ plano.preco }}</p>
-                    <ul>
-                        {% for feature in plano.features %}
-                        <li>{{ feature }}</li>
-                        {% endfor %}
-                    </ul>
-                    <form method="POST" action="{{ url_for('confirmar_assinatura', plano_id=plano.id) }}">
-                        <button type="submit" class="btn btn-success">Confirmar Assinatura</button>
-                    </form>
+<div class="confirmation-wrapper">
+    <div class="confirmation-container">
+        <div class="confirmation-card">
+            <div class="card-header">
+                <div class="plan-badge">{{ plano.nome }}</div>
+                <h2>Confirmar Assinatura</h2>
+                <p class="subtitle">Você está prestes a assinar o seguinte plano:</p>
+            </div>
+
+            <div class="price-section">
+                <span class="currency">R$</span>
+                <span class="amount">{{ "%.2f"|format(plano.preco) }}</span>
+                <span class="period">/mês</span>
+            </div>
+
+            <div class="features-section">
+                <h3>Benefícios Inclusos:</h3>
+                <ul class="features-list">
+                    {% for feature in plano.features.split(',') %}
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="confirmation-footer">
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Valor mensal:</span>
+                        <strong>R$ {{ "%.2f"|format(plano.preco) }}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Período:</span>
+                        <strong>Mensal</strong>
+                    </div>
                 </div>
+
+                <form method="POST" action="{{ url_for('confirmar_assinatura', plano_id=plano.id) }}">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('servicos') }}" class="btn-secondary">Voltar</a>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Confirmar Assinatura
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.confirmation-wrapper {
+    min-height: 100vh;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmation-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.confirmation-card {
+    background: var(--primary-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    padding: 2rem;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plan-badge {
+    background: var(--accent-color);
+    color: var(--text-color);
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.card-header h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+}
+
+.price-section {
+    text-align: center;
+    margin: 2rem 0;
+    color: var(--text-color);
+}
+
+.currency {
+    font-size: 2rem;
+    vertical-align: top;
+    margin-right: 0.25rem;
+}
+
+.amount {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+.period {
+    color: var(--gray);
+}
+
+.features-section {
+    margin: 2rem 0;
+}
+
+.features-section h3 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.features-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    padding: 0.5rem 0;
+}
+
+.features-list i {
+    color: var(--accent-color);
+}
+
+.confirmation-footer {
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+}
+
+.summary {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.summary-item:last-child {
+    margin-bottom: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .confirmation-wrapper {
+        padding: 2rem 1rem;
+    }
+
+    .features-list {
+        grid-template-columns: 1fr;
+    }
+
+    .price-section {
+        margin: 1.5rem 0;
+    }
+
+    .amount {
+        font-size: 3rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 {% endblock %}

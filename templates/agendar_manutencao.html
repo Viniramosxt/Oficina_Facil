@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}Agendar Manutenção - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="scheduling-wrapper">
+    <div class="scheduling-container">
+        <div class="scheduling-card">
+            <div class="card-header">
+                <i class="fas fa-tools header-icon"></i>
+                <h2>Agendar Manutenção</h2>
+                <p class="subtitle">Agende sua manutenção em poucos passos</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('agendar_manutencao') }}" class="scheduling-form">
+                <div class="form-grid">
+                    <!-- Seleção de Oficina -->
+                    <div class="form-group full-width">
+                        <label for="oficina">
+                            <i class="fas fa-warehouse"></i>
+                            Selecione a Oficina
+                        </label>
+                        <select id="oficina" name="oficina_id" required>
+                            <option value="">Escolha uma oficina...</option>
+                            {% for oficina in oficinas %}
+                            <option value="{{ oficina.id }}">{{ oficina.nome }} - {{ oficina.endereco }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Data e Horário -->
+                    <div class="form-group">
+                        <label for="data">
+                            <i class="fas fa-calendar"></i>
+                            Data Desejada
+                        </label>
+                        <input type="date" id="data" name="data" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="horario">
+                            <i class="fas fa-clock"></i>
+                            Horário
+                        </label>
+                        <input type="time" id="horario" name="horario" required>
+                    </div>
+
+                    <!-- Tipo de Serviço -->
+                    <div class="form-group full-width">
+                        <label for="servico">
+                            <i class="fas fa-car"></i>
+                            Tipo de Serviço
+                        </label>
+                        <select id="servico" name="servico" required>
+                            <option value="">Selecione o serviço...</option>
+                            <option value="revisao">Revisão Geral</option>
+                            <option value="manutencao">Manutenção Preventiva</option>
+                            <option value="reparo">Reparo Específico</option>
+                            <option value="eletrica">Sistema Elétrico</option>
+                            <option value="motor">Motor</option>
+                            <option value="freios">Sistema de Freios</option>
+                            <option value="suspensao">Suspensão</option>
+                        </select>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="form-group full-width">
+                        <label for="descricao">
+                            <i class="fas fa-comment-alt"></i>
+                            Descrição do Problema
+                        </label>
+                        <textarea id="descricao" name="descricao" rows="4" placeholder="Descreva o problema ou serviço necessário..." required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('historico_veiculo') }}" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-calendar-check"></i>
+                        Confirmar Agendamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.scheduling-wrapper {
+    min-height: 100vh;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scheduling-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.scheduling-card {
+    background: var(--primary-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.card-header h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+}
+
+.scheduling-form {
+    margin-top: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.form-group label i {
+    color: var(--accent-color);
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+}
+
+.form-group select option {
+    background: var(--primary-color);
+    color: var(--text-color);
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-primary,
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .scheduling-wrapper {
+        padding: 2rem 1rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

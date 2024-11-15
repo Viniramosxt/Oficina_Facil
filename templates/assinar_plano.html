@@ -1,166 +1,186 @@
 {% extends "base.html" %}
-
 {% block title %}Assinar Plano - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
 <div class="confirmation-container">
-  <header class="section-header">
-    <h1>Confirmação de Assinatura</h1>
-    <p class="subtitle">Você está prestes a assinar o plano: <strong>{{ plano.nome }}</strong></p>
-  </header>
-
-  <div class="plan-details">
-    <div class="plan-header">
-      <h3>{{ plano.nome }}</h3>
-      <div class="price">
-        <span class="amount">R$ {{ plano.preco }}</span>
-        <span class="period">/mês</span>
-      </div>
+    <div class="section-header">
+        <h1>Confirmação de Assinatura</h1>
+        <p class="subtitle">Você está prestes a assinar o plano</p>
     </div>
-    <div class="plan-features">
-      <ul>
-        {% for feature in plano.features %}
-          <li><i class="fas fa-check"></i> {{ feature }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
 
-  {% if message %}
-    <div class="alert alert-{{ message_category }}">
-      {{ message }}
-    </div>
-  {% endif %}
+    <div class="plan-card">
+        <div class="plan-header">
+            <h2>{{ plano.nome }}</h2>
+            <div class="price">
+                <span class="amount">R$ {{ plano.preco }}</span>
+                <span class="period">/mês</span>
+            </div>
+        </div>
 
-  <div class="actions">
-    <form method="POST" action="{{ url_for('confirmar_assinatura', plano_id=plano.id) }}">
-        <button type="submit" class="btn btn-success">Confirmar Assinatura</button>
-    </form>          
-    <a href="{{ url_for('perfil') }}" class="btn btn-primary">Ver Meu Perfil</a>
-    <a href="{{ url_for('servicos') }}" class="btn btn-secondary">Voltar para os Planos</a>
-  </div>
-  
+        <div class="plan-features">
+            <ul>
+                {% for feature in plano.features %}
+                    <li><i class="fas fa-check"></i> {{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if message %}
+            <div class="alert alert-{{ message_category }}">
+                <i class="fas fa-info-circle"></i>
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <div class="plan-actions">
+            <form method="POST" action="{{ url_for('confirmar_assinatura', plano_id=plano.id) }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    Confirmar Assinatura
+                </button>
+            </form>
+            <div class="secondary-actions">
+                <a href="{{ url_for('perfil') }}" class="btn btn-outline">
+                    <i class="fas fa-user"></i>
+                    Ver Meu Perfil
+                </a>
+                <a href="{{ url_for('servicos') }}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    Voltar para os Planos
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
-
 <style>
-  /* Reset e Variáveis */
-:root {
-  --primary-color: #1F2A44;
-  --secondary-color: #007BFF;
-  --accent-color: #FFC107;
-  --text-color: #FFFFFF;
-  --background-color: #2C3E50;
-  --black: #000000;
-  --gray: #CCCCCC;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --hover-color: #0056b3;
-  --transition-speed: 0.3s;
-  --font-family: 'Roboto', sans-serif;
-}
-
 .confirmation-container {
     padding: 2rem;
-    background-color: var(--background-color);
-  }
+    max-width: 800px;
+    margin: 80px auto 0;
+}
 
-  .section-header {
+.section-header {
     text-align: center;
     margin-bottom: 2rem;
-  }
+}
 
-  .plan-details {
-    background: #ffffff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .plan-header h3 {
-    font-size: 1.6rem;
-    color: var(--primary-color);
-  }
-
-  .price {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .amount {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: var(--primary-color);
-  }
-
-  .period {
-    font-size: 1.2rem;
-    color: var(--text-color);
-  }
-
-  .plan-features ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 1rem;
-  }
-
-  .plan-features li {
-    font-size: 1.1rem;
+.section-header h1 {
+    font-size: 2.2rem;
     color: var(--text-color);
     margin-bottom: 0.5rem;
-  }
+}
 
-  .plan-features i {
-    color: var(--secondary-color);
-    margin-right: 0.5rem;
-  }
+.subtitle {
+    color: var(--text-color);
+    opacity: 0.8;
+}
 
-  .actions {
+.plan-card {
+    background: var(--primary-color);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.plan-header h2 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.price {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+}
+
+.period {
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.plan-features {
+    margin-bottom: 2rem;
+}
+
+.plan-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features li {
     display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-  }
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    color: var(--text-color);
+}
 
-  .btn {
-    padding: 0.8rem 1.5rem;
+.plan-features i {
+    color: var(--accent-color);
+}
+
+.plan-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondary-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    width: 100%;
+    padding: 1rem;
     border-radius: 8px;
     font-weight: 500;
-    text-decoration: none;
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
-  }
+}
 
-  .btn-primary {
-    background: var(--secondary-color);
+.btn-primary {
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+}
+
+.btn-outline {
+    background: transparent;
     color: var(--text-color);
-  }
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-  .btn-secondary {
-    background: rgba(0, 0, 0, 0.1);
-    color: var(--text-color);
-  }
-
-  .btn:hover {
+.btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
+}
 
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
     .confirmation-container {
-      padding: 1rem;
+        padding: 1rem;
     }
-
-    .actions {
-      flex-direction: column;
+    
+    .secondary-actions {
+        flex-direction: column;
     }
-
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
+}
 </style>
 {% endblock %}

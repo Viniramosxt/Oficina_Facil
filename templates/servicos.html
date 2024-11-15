@@ -1,176 +1,203 @@
 {% extends "base.html" %}
-{% block title %}Serviços - OFICINA FÁCIL{% endblock %}
 {% block content %}
 <div class="services-container">
-  <!-- Seção de Planos Mensais -->
-  <section class="plans-section">
-    <header class="section-header">
-      <h1>Planos de Manutenção</h1>
-      <p class="subtitle">Escolha o plano mensal que melhor se adapta às necessidades do seu veículo</p>
-    </header>
-    <div class="plans-grid">
-      {% for plano in planos %}
-        <div class="plan-card {% if plano.id == 2 %}featured{% endif %}">
-          {% if plano.id == 2 %}
-            <div class="featured-badge">Mais Popular</div>
-          {% endif %}
-          <div class="plan-header">
-            <h3>{{ plano.nome }}</h3>
-            <div class="price">
-              <span class="amount">R$ {{ plano.preco }}</span>
-              <span class="period">/mês</span>
-            </div>
-          </div>
-          <div class="plan-features">
-            <ul>
-              {% for feature in plano.features %}
-                <li><i class="fas fa-check"></i> {{ feature }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% if current_user.is_authenticated %}
-            <a href="{{ url_for('assinar_plano', plano_id=plano.id) }}" class="plan-btn">Assinar Plano</a>
-          {% else %}
-            <a href="{{ url_for('login') }}" class="plan-btn">Assinar Plano</a>
-          {% endif %}
+    <div class="section plans-section">
+        <div class="section-header">
+            <h1>Planos de Manutenção</h1>
+            <p>Escolha o plano mensal que melhor se adapta às necessidades do seu veículo</p>
         </div>
-      {% endfor %}
+
+        <div class="plans-grid">
+            {% for plano in planos %}
+            <div class="plan-card {% if plano.id == 2 %}featured{% endif %}">
+                {% if plano.id == 2 %}
+                <div class="featured-badge">Mais Popular</div>
+                {% endif %}
+                
+                <div class="plan-header">
+                    <h3>{{ plano.nome }}</h3>
+                    <div class="price">
+                        <span class="currency">R$</span>
+                        <span class="amount">{{ "%.2f"|format(plano.preco) }}</span>
+                        <span class="period">/mês</span>
+                    </div>
+                </div>
+
+                <div class="plan-features">
+                    <ul>
+                        {% for feature in plano.features.split(',') %}
+                        <li>
+                            <i class="fas fa-check"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="plan-footer">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('assinar_plano', plano_id=plano.id) }}" class="btn-primary">
+                        Assinar Plano
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn-primary">
+                        Faça login para assinar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-  </section>
 </div>
+
 <style>
-  .services-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 80px auto 0;
-  color: var(--text-color);
+.services-container {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Estilos do cabeçalho das seções */
 .section-header {
-  text-align: center;
-  margin-bottom: 3rem;
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
-.section-header h1,
-.section-header h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: var(--text-color);
+.section-header h1 {
+    font-size: 2.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
 }
 
-.subtitle {
-  font-size: 1.2rem;
-  color: var(--text-color);
-  opacity: 0.8;
+.section-header p {
+    color: var(--gray);
+    font-size: 1.1rem;
 }
 
-/* Estilos dos Planos */
 .plans-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-gap: 2rem;
-  margin-bottom: 4rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 1rem;
 }
 
 .plan-card {
-  background: var(--primary-color);
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
-  position: relative;
+    background: var(--primary-color);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow);
 }
 
 .plan-card.featured {
-  border: 2px solid var(--accent-color);
-  transform: scale(1.05);
+    border: 2px solid var(--accent-color);
+    transform: scale(1.05);
 }
 
 .featured-badge {
-  position: absolute;
-  top: -12px;
-  right: 20px;
-  background: var(--accent-color);
-  color: var(--text-color);
-  padding: 0.3rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: var(--accent-color);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
 }
 
 .plan-header {
-  text-align: center;
-  margin-bottom: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plan-header h3 {
+    color: var(--text-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .price {
-  margin: 1rem 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    color: var(--text-color);
+}
+
+.currency {
+    font-size: 1.5rem;
+    margin-right: 0.25rem;
 }
 
 .amount {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--accent-color);
+    font-size: 3rem;
+    font-weight: bold;
 }
 
 .period {
-  color: var(--text-color);
-  opacity: 0.7;
+    color: var(--gray);
+    margin-left: 0.25rem;
+}
+
+.plan-features {
+    margin: 2rem 0;
 }
 
 .plan-features ul {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 2rem 0;
+    list-style: none;
+    padding: 0;
 }
 
 .plan-features li {
-  padding: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
 }
 
 .plan-features i {
-  color: var(--accent-color);
+    color: var(--accent-color);
 }
 
-.plan-btn {
-  display: block;
-  width: 100%;
-  padding: 1rem;
-  background: var(--secondary-color);
-  color: var(--text-color);
-  text-align: center;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s;
+.plan-footer {
+    text-align: center;
 }
 
-.plan-btn:hover {
-  background: var(--hover-color);
-  transform: translateY(-2px);
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .services-container {
+.btn-primary {
+    width: 100%;
     padding: 1rem;
-  }
+    border: none;
+    border-radius: 10px;
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
 
-  .plans-grid,
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
+.btn-primary:hover {
+    background: var(--hover-color);
+    transform: translateY(-2px);
+}
 
-  .plan-card.featured {
-    transform: none;
-  }
+@media (max-width: 968px) {
+    .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
-  .section-header h1,
-  .section-header h2 {
-    font-size: 2rem;
-  }
+@media (max-width: 768px) {
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-card.featured {
+        transform: none;
+    }
 }
 </style>
 {% endblock %}

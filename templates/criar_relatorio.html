@@ -1,25 +1,91 @@
-{% extends 'base.html' %}
+<!-- criar_relatorio.html -->
+{% extends "base.html" %}
+{% block title %}Criar Relatório - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-    <h1>Criar Relatório</h1>
-    <form method="POST">
-        <div class="form-group">
-            <label for="servico">Serviço:</label>
-            <input type="text" class="form-control" id="servico" name="servico" required>
+<div class="container report-container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title mb-0">Criar Relatório</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('criar_relatorio') }}">
+                        <div class="mb-3">
+                            <label for="servico" class="form-label">Serviço</label>
+                            <input type="text" class="form-control" id="servico" name="servico" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cliente" class="form-label">Cliente</label>
+                            <select class="form-select" id="cliente" name="id_cliente" required>
+                                <option value="">Selecione um cliente...</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}">{{ cliente.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Criar Relatório</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="descricao">Descrição:</label>
-            <textarea class="form-control" id="descricao" name="descricao" rows="5" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="id_cliente">Cliente:</label>
-            <select class="form-control" id="id_cliente" name="id_cliente" required>
-                <option value="">Selecione um cliente</option>
-                {% for cliente in clientes %}
-                    <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Criar Relatório</button>
-    </form>
+    </div>
+</div>
+
+<style>
+    .report-container {
+        padding: 40px 0;
+    }
+
+    .card {
+        border-radius: 15px;
+        border: none;
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 10px 15px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-primary {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+</style>
 {% endblock %}

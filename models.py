@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    tipo = db.Column(db.String(20), default='cliente')
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     
     # Informações do veículo
@@ -24,10 +25,8 @@ class User(db.Model, UserMixin):
     foto_perfil = db.Column(db.String(200), nullable=True)
     foto_crlv = db.Column(db.String(200), nullable=True)
 
-    # Relacionamento com o histórico de relatórios do cliente
+    # Relacionamentos
     relatorios = db.relationship('Relatorio', backref='cliente', lazy=True)
-
-    # Relacionamento com o plano assinado
     plano_assinado_id = db.Column(db.Integer, db.ForeignKey('plano.id'), nullable=True)
     
     oficina = db.relationship('Oficina', backref='user', lazy=True)
@@ -40,7 +39,7 @@ class Plano(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     preco = db.Column(db.Float, nullable=False)
-    features = db.Column(db.PickleType, nullable=False)
+    features = db.Column(db.String(255), nullable=False)
 
     # Relationship with the User model
     usuarios = db.relationship('User', backref='plano_assinado', lazy=True)
@@ -55,7 +54,7 @@ class Oficina(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    senha_hash = db.Column(db.String(100), nullable=False)
+    senha = db.Column(db.String(255), nullable=False)  # Aumentado para 255
     cnpj = db.Column(db.String(18), unique=True, nullable=False)
     endereco = db.Column(db.String(255))
     telefone = db.Column(db.String(50))
@@ -77,7 +76,7 @@ class Oficina(db.Model):
                  horario_fds=None, logo=None):
         self.nome = nome
         self.email = email
-        self.set_password(senha)
+        self.senha = senha  # Armazena a senha diretamente
         self.cnpj = cnpj
         self.endereco = endereco
         self.telefone = telefone
@@ -90,11 +89,13 @@ class Oficina(db.Model):
         self.atendimentos = 0
         self.avaliacao = 5.0
 
-    def set_password(self, password):
-        self.senha_hash = generate_password_hash(password)
-
     def check_password(self, password):
-        return check_password_hash(self.senha_hash, password)
+        # Compara diretamente a senha armazenada com a fornecida
+        return self.senha == password
+
+    def __repr__(self):
+        return f'<Oficina {self.nome}>'
+
 
     def __repr__(self):
         return f'<Oficina {self.nome}>'
@@ -102,12 +103,12 @@ class Oficina(db.Model):
 
 class Funcionario(db.Model):
     __tablename__ = 'funcionario'
-
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    senha = db.Column(db.String(150), nullable=False)
-    id_oficina = db.Column(db.Integer, db.ForeignKey('oficina.id'), nullable=False)
+    nome = db.Column(db.String(150))
+    email = db.Column(db.String(150))
+    senha = db.Column(db.String(255))
+    id_oficina = db.Column(db.Integer, db.ForeignKey('oficina.id'))
+
 
     # Relacionamento com os relatórios gerados pelo funcionário
     relatorios = db.relationship('Relatorio', backref='funcionario', lazy=True)

@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% block title %}Funcionários - OFICINA FÁCIL{% endblock %}
+
+{% block content %}
+<div class="funcionarios-wrapper">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-users"></i>
+            Funcionários
+        </h1>
+        <a href="{{ url_for('cadastrar_funcionario') }}" class="btn-add">
+            <i class="fas fa-user-plus"></i>
+            Novo Funcionário
+        </a>
+    </div>
+
+    {% if funcionarios %}
+        <div class="funcionarios-grid">
+            {% for funcionario in funcionarios %}
+            <div class="funcionario-card">
+                <div class="card-header">
+                    <div class="user-info">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="details">
+                            <h3>{{ funcionario.nome }}</h3>
+                            <span class="email">{{ funcionario.email }}</span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a href="{{ url_for('editar_funcionario', id=funcionario.id) }}" 
+                           class="btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button 
+    data-funcionario-id="{{ funcionario.id }}" 
+    class="btn-delete" 
+    title="Deletar"
+    onclick="confirmarDelecao(this.dataset.funcionarioId)">
+    <i class="fas fa-trash"></i>
+</button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="stats">
+                        <div class="stat-item">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>{{ funcionario.relatorios|length }} relatórios</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Desde {{ funcionario.created_at.strftime('%d/%m/%Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-users-slash"></i>
+            <h3>Nenhum Funcionário Cadastrado</h3>
+            <p>Comece adicionando seu primeiro funcionário!</p>
+            <a href="{{ url_for('cadastrar_funcionario') }}" class="btn-add">
+                <i class="fas fa-user-plus"></i>
+                Cadastrar Funcionário
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <h3>Confirmar Exclusão</h3>
+        <p>Tem certeza que deseja excluir este funcionário?</p>
+        <div class="modal-actions">
+            <button onclick="closeModal()" class="btn-secondary">Cancelar</button>
+            <form id="deleteForm" method="POST" style="display: inline;">
+                <button type="submit" class="btn-danger">Confirmar Exclusão</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.funcionarios-wrapper {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.funcionarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.funcionario-card {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.details h3 {
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.email {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background: rgba(255, 193, 7, 0.2);
+    color: var(--accent-color);
+}
+
+.btn-delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.btn-edit:hover,
+.btn-delete:hover {
+    transform: translateY(-2px);
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: var(--surface-color);
+    border-radius: 12px;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--surface-color);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.btn-secondary,
+.btn-danger {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .funcionarios-wrapper {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .funcionarios-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+    // Função para montar a URL de deleção usando template literal do JavaScript
+    function confirmarDelecao(funcionarioId) {
+        const modal = document.getElementById('deleteModal');
+        const form = document.getElementById('deleteForm');
+        
+        // Use template literals do JavaScript para criar a URL
+        form.action = `/funcionarios/deletar/${funcionarioId}`;
+        modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('deleteModal');
+        modal.style.display = 'none';
+    }
+    
+    // Fechar modal ao clicar fora dele
+    window.onclick = function(event) {
+        const modal = document.getElementById('deleteModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+    </script>
+{% endblock %}

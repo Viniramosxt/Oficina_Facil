@@ -1,31 +1,242 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Relatórios - OFICINA FÁCIL{% endblock %}
 
 {% block content %}
-    <h1>Relatórios</h1>
+<div class="reports-container">
+    <div class="section-header">
+        <h1>Relatórios</h1>
+        <div class="header-actions">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar relatórios...">
+                <i class="fas fa-search"></i>
+            </div>
+            <button class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Novo Relatório
+            </button>
+        </div>
+    </div>
+
     {% if relatorios %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Serviço</th>
-                    <th>Cliente</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for relatorio in relatorios %}
+        <div class="reports-table">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ relatorio.data.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ relatorio.servico }}</td>
-                        <td>{{ relatorio.cliente.nome }}</td>
-                        <td>
-                            <a href="{{ url_for('visualizar_relatorio', id=relatorio.id) }}" class="btn btn-primary">Visualizar</a>
-                        </td>
+                        <th>Data</th>
+                        <th>Serviço</th>
+                        <th>Cliente</th>
+                        <th>Status</th>
+                        <th>Ações</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for relatorio in relatorios %}
+                        <tr>
+                            <td>{{ relatorio.data.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ relatorio.servico }}</td>
+                            <td>{{ relatorio.cliente.nome }}</td>
+                            <td>
+                                <span class="status-badge">Concluído</span>
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('visualizar_relatorio', id=relatorio.id) }}" 
+                                   class="btn-icon" title="Visualizar">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="btn-icon" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn-icon delete" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>Nenhum relatório encontrado.</p>
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Nenhum relatório encontrado</h3>
+            <p>Comece criando seu primeiro relatório.</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Criar Relatório
+            </button>
+        </div>
     {% endif %}
+</div>
+
+<style>
+.reports-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 80px auto 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h1 {
+    font-size: 2.2rem;
+    color: var(--text-color);
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box input {
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    width: 300px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.5;
+}
+
+.reports-table {
+    background: var(--primary-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    color: var(--text-color);
+}
+
+th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 500;
+}
+
+tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+tr:last-child {
+    border-bottom: none;
+}
+
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-icon.delete {
+    color: #dc3545;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--primary-color);
+    border-radius: 12px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-color);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .reports-container {
+        padding: 1rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+    
+    .reports-table {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 800px;
+    }
+}
+</style>
 {% endblock %}
